@@ -1,0 +1,14 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "repo",
+    srcs = ["repo.go"],
+    importpath = "github.com/lodestar-cli/lodestar/internal/common/repo",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//vendor/github.com/go-git/go-billy/v5/memfs",
+        "//vendor/github.com/go-git/go-git/v5:go-git",
+        "//vendor/github.com/go-git/go-git/v5/plumbing/transport/http",
+        "//vendor/github.com/go-git/go-git/v5/storage/memory",
+    ],
+)

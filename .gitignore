@@ -1,0 +1,7 @@
+# based on the name of the directory bazel is cloned into.
+bazel-*
+bazel-*/*
+# Ignore outputs generated during Bazel bootstrapping.
+/output/
+# Ignore goland files
+.idea/*
