@@ -1,0 +1,18 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
+
+go_library(
+    name = "lodestar_lib",
+    srcs = ["main.go"],
+    importpath = "github.com/lodestar-cli/lodestar/cmd/lodestar",
+    visibility = ["//visibility:private"],
+    deps = [
+        "//internal/app",
+        "//vendor/github.com/urfave/cli/v2:cli",
+    ],
+)
+
+go_binary(
+    name = "lodestar",
+    embed = [":lodestar_lib"],
+    visibility = ["//visibility:public"],
+)

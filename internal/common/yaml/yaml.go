@@ -54,9 +54,8 @@ func findTag(lines []string) ([]int, error) {
 	var tagLines []int
 
 	for i, line := range lines {
-		if strings.Contains(line, "###ahoy:tag###") {
+		if strings.Contains(line, "###lodestar:tag###") {
 			tagLines = append(tagLines, i)
-
 			if len(tagLines) == 2 {
 				break
 			}

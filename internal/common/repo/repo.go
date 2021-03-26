@@ -1,6 +1,7 @@
 package repo
 import (
 	"fmt"
+	"context"
 	"github.com/go-git/go-billy/v5/memfs"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/transport/http"
@@ -14,16 +15,14 @@ var (
 
 func GetRepository(repository string, auth *http.BasicAuth) (*git.Repository, error) {
 
-	clone, err := git.Clone(storer, fs, &git.CloneOptions{
+	clone, err := git.CloneContext(context.TODO(),storer, fs, &git.CloneOptions{
 		URL:  repository,
 		Auth: auth,
 	})
 	if err != nil {
-		fmt.Printf("%v", err)
 		return nil, err
 	}
 
-	fmt.Println("Repository cloned")
 	return clone, nil
 
 }
@@ -49,18 +48,18 @@ func GetFileContent(path string) (string, error){
 	return content, nil
 }
 
-func UpdateAndPush(repository *git.Repository, configPath string, newConfig string, auth *http.BasicAuth, oldTag string, newTag string) (string, error){
+func UpdateAndPush(repository *git.Repository, configPath string, newConfig string, auth *http.BasicAuth, oldTag string, newTag string) error{
 	worktree, err := repository.Worktree()
 	if err != nil {
 		fmt.Printf("%v", err)
-		return "", err
+		return err
 	}
 
 	worktree.Remove(configPath)
 
 	configFile, err := fs.Create(configPath)
 	if err != nil {
-		return "", err
+		return err
 	}
 	configFile.Write([]byte(newConfig))
 	worktree.Add(configPath)
@@ -72,9 +71,9 @@ func UpdateAndPush(repository *git.Repository, configPath string, newConfig stri
 		Auth:       auth,
 	})
 	if err != nil {
-		return "" , err
+		return err
 	}
 
-	return "Commit Pushed!", nil
+	return nil
 
 }
