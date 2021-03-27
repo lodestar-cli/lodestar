@@ -55,19 +55,43 @@ func UpdateAndPush(repository *git.Repository, configPath string, newConfig stri
 		return err
 	}
 
-	worktree.Remove(configPath)
+	r, err :=worktree.Remove(configPath)
+	if err != nil {
+		fmt.Println(err)
+		fmt.Println(r)
+		return err
+	}
 
 	configFile, err := fs.Create(configPath)
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
-	configFile.Write([]byte(newConfig))
-	worktree.Add(configPath)
 
-	worktree.Commit("Config file updated with Bazel: "+oldTag+" ---> "+newTag, &git.CommitOptions{})
+	c, err := configFile.Write([]byte(newConfig))
+	if err != nil {
+		fmt.Println(err)
+		fmt.Println(c)
+		return err
+	}
+
+	w, err := worktree.Add(configPath)
+	if err != nil {
+		fmt.Println(err)
+		fmt.Println(w)
+		return err
+	}
+
+	co, err := worktree.Commit("Config file updated with Bazel: "+oldTag+" ---> "+newTag, &git.CommitOptions{})
+	if err != nil {
+		fmt.Println(err)
+		fmt.Println(co)
+		return err
+	}
 
 
 	err = repository.Push(&git.PushOptions{
+		RemoteName: "origin",
 		Auth:       auth,
 	})
 	if err != nil {
