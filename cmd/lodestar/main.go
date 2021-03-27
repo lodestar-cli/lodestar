@@ -66,7 +66,6 @@ func main() {
 						},
 						Action: func(c *cli.Context) error {
 							err :=lodeApp.Push(username,token,url,srcPath,tag)
-
 							return err
 						},
 					},

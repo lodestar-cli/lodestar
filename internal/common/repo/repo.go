@@ -71,6 +71,7 @@ func UpdateAndPush(repository *git.Repository, configPath string, newConfig stri
 		Auth:       auth,
 	})
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 
