@@ -1,4 +1,4 @@
-module github.com/goccy/go-yaml
+module github.com/goccy/go-tag
 
 go 1.12
 

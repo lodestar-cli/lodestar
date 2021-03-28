@@ -5,26 +5,26 @@ import (
 )
 
 type appEnvironment struct {
-	Name string `yaml:"name"`
-	SrcPath string `yaml:"srcPath"`
+	Name string `tag:"name"`
+	SrcPath string `tag:"srcPath"`
 }
 
 type LodestarAppConfig struct {
 	AppInfo struct {
-		Name string   `yaml:"name"`
-		Type string `yaml:"type"`
-		Description string `yaml:"description"`
-		RepoUrl string `yaml:"repoUrl"`
-		Target string `yaml:"target"`
-		StatePath string `yaml:"statePath"`
-	} `yaml:"appInfo"`
-	EnvGraph []appEnvironment `yaml:"envGraph,flow"`
+		Name string   `tag:"name"`
+		Type string `tag:"type"`
+		Description string `tag:"description"`
+		RepoUrl string `tag:"repoUrl"`
+		Target string `tag:"target"`
+		StatePath string `tag:"statePath"`
+	} `tag:"appInfo"`
+	EnvGraph []appEnvironment `tag:"envGraph,flow"`
 }
 
 
-//retrieves object from config yaml
+//retrieves object from config tag
 func GetAppConfig(path string) (*LodestarAppConfig, error){
-	//read from app configuration yaml
+	//read from app configuration tag
 	content, err := lodestarDir.GetConfigContent(path)
 	if err != nil {
 		return nil, err

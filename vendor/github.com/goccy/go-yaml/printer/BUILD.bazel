@@ -3,12 +3,12 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library")
 go_library(
     name = "printer",
     srcs = ["printer.go"],
-    importmap = "github.com/lodestar-cli/lodestar/vendor/github.com/goccy/go-yaml/printer",
-    importpath = "github.com/goccy/go-yaml/printer",
+    importmap = "github.com/lodestar-cli/lodestar/vendor/github.com/goccy/go-tag/printer",
+    importpath = "github.com/goccy/go-tag/printer",
     visibility = ["//visibility:public"],
     deps = [
         "//vendor/github.com/fatih/color",
-        "//vendor/github.com/goccy/go-yaml/ast",
-        "//vendor/github.com/goccy/go-yaml/token",
+        "//vendor/github.com/goccy/go-tag/ast",
+        "//vendor/github.com/goccy/go-tag/token",
     ],
 )

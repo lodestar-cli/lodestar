@@ -15,7 +15,7 @@ go_library(
         "//internal/common/auth",
         "//internal/common/lodestarDir",
         "//internal/common/repo",
-        "//internal/common/yaml",
-        "//vendor/github.com/goccy/go-yaml",
+        "//internal/common/tag",
+        "//vendor/github.com/goccy/go-tag",
     ],
 )

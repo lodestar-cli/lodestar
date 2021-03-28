@@ -1,13 +1,10 @@
 package main
 
 import (
-	"errors"
-	"fmt"
+	app "github.com/lodestar-cli/lodestar/internal/app"
+	"github.com/urfave/cli/v2"
 	"log"
 	"os"
-	"github.com/urfave/cli/v2"
-	app "github.com/lodestar-cli/lodestar/internal/app"
-	lodestarDir "github.com/lodestar-cli/lodestar/internal/common/lodestarDir"
 )
 
 func main() {
@@ -19,10 +16,11 @@ func main() {
 	var appConfigPath string
 	var destEnv string
 	var environment string
+	var outputState bool
 
 	app := &cli.App{
 		Name: "lodestar",
-		Version: "0.1.0",
+		Version: "0.1.1",
 		Usage: "Help guide your applications through their environments",
 		Commands: []*cli.Command{
 			{
@@ -31,7 +29,7 @@ func main() {
 				Subcommands: []*cli.Command{
 					{
 						Name:  "push",
-						Usage: "Update an App Environment's configuration file with new tag",
+						Usage: "Push a new image tag to an Environment",
 						UsageText: "In order to push a tag to an environment, either a name for an App configured in ~/.lodestar\n\t"+
 							       " needs to be provided with --name, or a path to an app needs to be provided with --config-path.\n\t"+
 							       " Lodestar will then be able to find the App and pass the tag to the correct environment.",
@@ -77,61 +75,23 @@ func main() {
 								Required: true,
 								Destination: &tag,
 							},
+							&cli.BoolFlag{
+								Name: "output-state",
+								Usage: "will create a local yaml file of the updated app state when set",
+								Destination: &outputState,
+							},
 						},
 						Action: func(c *cli.Context) error {
-							var config *app.LodestarAppConfig
-
-							if name == "" && appConfigPath == "" {
-								return errors.New("Must provide an App name or a path to a configuration file. For more information, run: lodestar app push --help")
-							} else if appConfigPath != ""{
-								config, err := app.GetAppConfig(appConfigPath)
-								if err != nil {
-									return err
-								}
-								if len(config.EnvGraph) < 1 {
-									return errors.New("No environments are provided for "+config.AppInfo.Name)
-								}
-
-								for _, env := range config.EnvGraph{
-									if env.Name == environment {
-										err := app.Push(username,token,config.AppInfo.RepoUrl,env.SrcPath,tag)
-										if err != nil {
-											return err
-										}
-										break
-									}
-								}
-								return nil
-							} else{
-								path, err := lodestarDir.GetConfigPath("app", name)
-								if err != nil {
-									return err
-								}
-								fmt.Printf("Retrieving config for %s...\n", name)
-								config, err = app.GetAppConfig(path)
-								if err != nil {
-									return err
-								}
-								if len(config.EnvGraph) < 1 {
-									return errors.New("No environments are provided for "+name)
-								}
-
-								for _, env := range config.EnvGraph{
-									if env.Name == environment {
-										err := app.Push(username,token,config.AppInfo.RepoUrl,env.SrcPath,tag)
-										if err != nil {
-											return err
-										}
-										break
-									}
-								}
-								return nil
+							err := app.Push(username,token,name,appConfigPath,environment,tag, outputState)
+							if err != nil {
+								return err
 							}
+							return nil
 						},
 					},
 					{
 						Name:  "promote",
-						Usage: "promote an image tag to the next environment",
+						Usage: "Promote an image tag to the next environment",
 						UsageText: "In order to promote an environment's tag, either a name for an App configured in ~/.lodestar\n\t"+
 							" needs to be provided with --name, or a path to an app needs to be provided with --config-path.\n\t"+
 							" Lodestar will then be able to find the App and pass the tag to the correct environment.",
@@ -174,66 +134,25 @@ func main() {
 								Required: true,
 								Destination: &destEnv,
 							},
+							&cli.BoolFlag{
+								Name: "output-state",
+								Usage: "will create a local yaml file of the updated app state when set",
+								Destination: &outputState,
+							},
 						},
 						Action: func(c *cli.Context) error {
-							var config *app.LodestarAppConfig
-							var srcPath string
-							var destPath string
-							if name == "" && appConfigPath == "" {
-								return errors.New("Must provide an App name or a path to a configuration file. For more information, run: lodestar app push --help")
-							} else if appConfigPath != ""{
-								config, err := app.GetAppConfig(appConfigPath)
-								if err != nil {
-									return err
-								}
-								if len(config.EnvGraph) < 1 {
-									return errors.New("No environments are provided for "+config.AppInfo.Name)
-								}
-
-								for _, env := range config.EnvGraph {
-									if env.Name == srcEnv {
-										srcPath=env.SrcPath
-									}else if env.Name == destEnv {
-										destPath=env.SrcPath
-									}
-									if srcPath != "" && destPath != "" {
-										break
-									}
-								}
-								err = app.Promote(username,token,config.AppInfo.RepoUrl,srcPath,destPath)
-								return err
-							} else {
-								path, err := lodestarDir.GetConfigPath("app", name)
-								if err != nil {
-									return err
-								}
-								fmt.Printf("Retrieving config for %s...\n", name)
-								config, err = app.GetAppConfig(path)
-								if err != nil {
-									return err
-								}
-								if len(config.EnvGraph) < 1 {
-									return errors.New("No environments are provided for " + name)
-								}
-
-								for _, env := range config.EnvGraph {
-									if env.Name == srcEnv {
-										srcPath=env.SrcPath
-									}else if env.Name == destEnv {
-										destPath=env.SrcPath
-									}
-									if srcPath != "" && destPath != "" {
-										break
-									}
-								}
-								err = app.Promote(username,token,config.AppInfo.RepoUrl,srcPath,destPath)
+							err := app.Promote(username,token,name,appConfigPath,srcEnv,destEnv,outputState)
+							if err != nil {
 								return err
 							}
+							return nil
 						},
 					},
 					{
 						Name:  "list",
-						Usage: "list all Apps in current context",
+						Usage: "List current context Apps",
+						UsageText: "Will provide all the Apps within the current context as well as a description of the app.\n\t"+
+							" App names and descriptions come directly from the appInfo block in their respective App configuration file.",
 						Action: func(c *cli.Context) error {
 							err := app.List()
 							return err
@@ -241,7 +160,7 @@ func main() {
 					},
 					{
 						Name:  "show",
-						Usage: "prints the configuration file for the specified App",
+						Usage: "Prints the configuration file for the specified App",
 						Flags: []cli.Flag{
 							&cli.StringFlag{
 								Name:        "name",
@@ -251,10 +170,6 @@ func main() {
 							},
 						},
 						Action: func(c *cli.Context) error {
-
-							if name == "" {
-								return errors.New("Must provide an App name. \n For more information, run: lodestar app push --help")
-							}
 							err := app.Show(name)
 							return err
 						},

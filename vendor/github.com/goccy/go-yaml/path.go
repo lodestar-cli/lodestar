@@ -175,7 +175,7 @@ func (p *Path) ReadNode(r io.Reader) (ast.Node, error) {
 	}
 	f, err := parser.ParseBytes(buf.Bytes(), 0)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to parse yaml")
+		return nil, errors.Wrapf(err, "failed to parse tag")
 	}
 	node, err := p.FilterFile(f)
 	if err != nil {

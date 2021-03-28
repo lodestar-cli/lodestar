@@ -3,7 +3,7 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library")
 go_library(
     name = "token",
     srcs = ["token.go"],
-    importmap = "github.com/lodestar-cli/lodestar/vendor/github.com/goccy/go-yaml/token",
-    importpath = "github.com/goccy/go-yaml/token",
+    importmap = "github.com/lodestar-cli/lodestar/vendor/github.com/goccy/go-tag/token",
+    importpath = "github.com/goccy/go-tag/token",
     visibility = ["//visibility:public"],
 )
