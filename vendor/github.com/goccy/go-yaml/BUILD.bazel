@@ -1,7 +1,7 @@
 load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
-    name = "go-yaml",
+    name = "go-tag",
     srcs = [
         "decode.go",
         "encode.go",
@@ -10,17 +10,17 @@ go_library(
         "path.go",
         "struct.go",
         "validate.go",
-        "yaml.go",
+        "tag.go",
     ],
-    importmap = "github.com/lodestar-cli/lodestar/vendor/github.com/goccy/go-yaml",
-    importpath = "github.com/goccy/go-yaml",
+    importmap = "github.com/lodestar-cli/lodestar/vendor/github.com/goccy/go-tag",
+    importpath = "github.com/goccy/go-tag",
     visibility = ["//visibility:public"],
     deps = [
-        "//vendor/github.com/goccy/go-yaml/ast",
-        "//vendor/github.com/goccy/go-yaml/internal/errors",
-        "//vendor/github.com/goccy/go-yaml/parser",
-        "//vendor/github.com/goccy/go-yaml/printer",
-        "//vendor/github.com/goccy/go-yaml/token",
+        "//vendor/github.com/goccy/go-tag/ast",
+        "//vendor/github.com/goccy/go-tag/internal/errors",
+        "//vendor/github.com/goccy/go-tag/parser",
+        "//vendor/github.com/goccy/go-tag/printer",
+        "//vendor/github.com/goccy/go-tag/token",
         "//vendor/golang.org/x/xerrors",
     ],
 )

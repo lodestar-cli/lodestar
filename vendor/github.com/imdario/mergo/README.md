@@ -159,7 +159,7 @@ func main() {
 
 Note: if test are failing due missing package, please execute:
 
-    go get gopkg.in/yaml.v2
+    go get gopkg.in/tag.v2
 
 ### Transformers
 

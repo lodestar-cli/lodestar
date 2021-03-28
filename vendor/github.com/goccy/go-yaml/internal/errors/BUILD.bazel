@@ -3,12 +3,12 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library")
 go_library(
     name = "errors",
     srcs = ["error.go"],
-    importmap = "github.com/lodestar-cli/lodestar/vendor/github.com/goccy/go-yaml/internal/errors",
-    importpath = "github.com/goccy/go-yaml/internal/errors",
-    visibility = ["//vendor/github.com/goccy/go-yaml:__subpackages__"],
+    importmap = "github.com/lodestar-cli/lodestar/vendor/github.com/goccy/go-tag/internal/errors",
+    importpath = "github.com/goccy/go-tag/internal/errors",
+    visibility = ["//vendor/github.com/goccy/go-tag:__subpackages__"],
     deps = [
-        "//vendor/github.com/goccy/go-yaml/printer",
-        "//vendor/github.com/goccy/go-yaml/token",
+        "//vendor/github.com/goccy/go-tag/printer",
+        "//vendor/github.com/goccy/go-tag/token",
         "//vendor/golang.org/x/xerrors",
     ],
 )

@@ -1,14 +1,14 @@
-package yaml
+package tag
 
 import (
 	"errors"
 	"strings"
 )
 
-func ReplaceTag(yaml string, tag string) (string, error) {
+func Replace(yaml string, tag string) (string, error) {
 	split := strings.Split(yaml, "\n")
 
-	tagLines, err := findTag(split)
+	tagLines, err := find(split)
 	if err != nil {
 		return "", err
 	}
@@ -28,11 +28,11 @@ func ReplaceTag(yaml string, tag string) (string, error) {
 	return yaml, nil
 }
 
-func GetTag(yaml string) (string, error) {
+func Get(yaml string) (string, error) {
 	var tag string
 	split := strings.Split(yaml, "\n")
 
-	tagLines, err := findTag(split)
+	tagLines, err := find(split)
 	if err != nil {
 		return "", err
 	}
@@ -50,7 +50,7 @@ func GetTag(yaml string) (string, error) {
 	return tag, nil
 }
 
-func findTag(lines []string) ([]int, error) {
+func find(lines []string) ([]int, error) {
 	var tagLines []int
 
 	for i, line := range lines {

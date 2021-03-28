@@ -1,13 +1,10 @@
 package main
 
 import (
-	"errors"
-	"fmt"
+	app "github.com/lodestar-cli/lodestar/internal/app"
+	"github.com/urfave/cli/v2"
 	"log"
 	"os"
-	"github.com/urfave/cli/v2"
-	app "github.com/lodestar-cli/lodestar/internal/app"
-	lodestarDir "github.com/lodestar-cli/lodestar/internal/common/lodestarDir"
 )
 
 func main() {
@@ -79,54 +76,11 @@ func main() {
 							},
 						},
 						Action: func(c *cli.Context) error {
-							var config *app.LodestarAppConfig
-
-							if name == "" && appConfigPath == "" {
-								return errors.New("Must provide an App name or a path to a configuration file. For more information, run: lodestar app push --help")
-							} else if appConfigPath != ""{
-								config, err := app.GetAppConfig(appConfigPath)
-								if err != nil {
-									return err
-								}
-								if len(config.EnvGraph) < 1 {
-									return errors.New("No environments are provided for "+config.AppInfo.Name)
-								}
-
-								for _, env := range config.EnvGraph{
-									if env.Name == environment {
-										err := app.Push(username,token,config.AppInfo.RepoUrl,env.SrcPath,tag)
-										if err != nil {
-											return err
-										}
-										break
-									}
-								}
-								return nil
-							} else{
-								path, err := lodestarDir.GetConfigPath("app", name)
-								if err != nil {
-									return err
-								}
-								fmt.Printf("Retrieving config for %s...\n", name)
-								config, err = app.GetAppConfig(path)
-								if err != nil {
-									return err
-								}
-								if len(config.EnvGraph) < 1 {
-									return errors.New("No environments are provided for "+name)
-								}
-
-								for _, env := range config.EnvGraph{
-									if env.Name == environment {
-										err := app.Push(username,token,config.AppInfo.RepoUrl,env.SrcPath,tag)
-										if err != nil {
-											return err
-										}
-										break
-									}
-								}
-								return nil
+							err := app.Push(username,token,name,appConfigPath,environment,tag)
+							if err != nil {
+								return err
 							}
+							return nil
 						},
 					},
 					{
@@ -176,59 +130,11 @@ func main() {
 							},
 						},
 						Action: func(c *cli.Context) error {
-							var config *app.LodestarAppConfig
-							var srcPath string
-							var destPath string
-							if name == "" && appConfigPath == "" {
-								return errors.New("Must provide an App name or a path to a configuration file. For more information, run: lodestar app push --help")
-							} else if appConfigPath != ""{
-								config, err := app.GetAppConfig(appConfigPath)
-								if err != nil {
-									return err
-								}
-								if len(config.EnvGraph) < 1 {
-									return errors.New("No environments are provided for "+config.AppInfo.Name)
-								}
-
-								for _, env := range config.EnvGraph {
-									if env.Name == srcEnv {
-										srcPath=env.SrcPath
-									}else if env.Name == destEnv {
-										destPath=env.SrcPath
-									}
-									if srcPath != "" && destPath != "" {
-										break
-									}
-								}
-								err = app.Promote(username,token,config.AppInfo.RepoUrl,srcPath,destPath)
-								return err
-							} else {
-								path, err := lodestarDir.GetConfigPath("app", name)
-								if err != nil {
-									return err
-								}
-								fmt.Printf("Retrieving config for %s...\n", name)
-								config, err = app.GetAppConfig(path)
-								if err != nil {
-									return err
-								}
-								if len(config.EnvGraph) < 1 {
-									return errors.New("No environments are provided for " + name)
-								}
-
-								for _, env := range config.EnvGraph {
-									if env.Name == srcEnv {
-										srcPath=env.SrcPath
-									}else if env.Name == destEnv {
-										destPath=env.SrcPath
-									}
-									if srcPath != "" && destPath != "" {
-										break
-									}
-								}
-								err = app.Promote(username,token,config.AppInfo.RepoUrl,srcPath,destPath)
+							err := app.Promote(username,token,name,appConfigPath,srcEnv,destEnv)
+							if err != nil {
 								return err
 							}
+							return nil
 						},
 					},
 					{
@@ -251,10 +157,6 @@ func main() {
 							},
 						},
 						Action: func(c *cli.Context) error {
-
-							if name == "" {
-								return errors.New("Must provide an App name. \n For more information, run: lodestar app push --help")
-							}
 							err := app.Show(name)
 							return err
 						},
