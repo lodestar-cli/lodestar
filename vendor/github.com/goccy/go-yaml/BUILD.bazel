@@ -9,8 +9,8 @@ go_library(
         "option.go",
         "path.go",
         "struct.go",
-        "validate.go",
         "tag.go",
+        "validate.go",
     ],
     importmap = "github.com/lodestar-cli/lodestar/vendor/github.com/goccy/go-tag",
     importpath = "github.com/goccy/go-tag",
@@ -21,6 +21,31 @@ go_library(
         "//vendor/github.com/goccy/go-tag/parser",
         "//vendor/github.com/goccy/go-tag/printer",
         "//vendor/github.com/goccy/go-tag/token",
+        "//vendor/golang.org/x/xerrors",
+    ],
+)
+
+go_library(
+    name = "go-yaml",
+    srcs = [
+        "decode.go",
+        "encode.go",
+        "error.go",
+        "option.go",
+        "path.go",
+        "struct.go",
+        "validate.go",
+        "yaml.go",
+    ],
+    importmap = "github.com/lodestar-cli/lodestar/vendor/github.com/goccy/go-yaml",
+    importpath = "github.com/goccy/go-yaml",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//vendor/github.com/goccy/go-yaml/ast",
+        "//vendor/github.com/goccy/go-yaml/internal/errors",
+        "//vendor/github.com/goccy/go-yaml/parser",
+        "//vendor/github.com/goccy/go-yaml/printer",
+        "//vendor/github.com/goccy/go-yaml/token",
         "//vendor/golang.org/x/xerrors",
     ],
 )

@@ -9,7 +9,7 @@ import (
 
 const (
 	// StructTagName tag keyword for Marshal/Unmarshal
-	StructTagName = "tag"
+	StructTagName = "yaml"
 )
 
 // StructField information for each the field in structure
@@ -26,7 +26,7 @@ type StructField struct {
 }
 
 func getTag(field reflect.StructField) string {
-	// If struct tag `tag` exist, use that. If no `tag`
+	// If struct tag `yaml` exist, use that. If no `yaml`
 	// exists, but `json` does, use that and try the best to
 	// adhere to its rules
 	tag := field.Tag.Get(StructTagName)

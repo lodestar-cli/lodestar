@@ -107,7 +107,7 @@ func (e *Encoder) EncodeToNodeContext(ctx context.Context, v interface{}) (ast.N
 func (e *Encoder) encodeDocument(doc []byte) (ast.Node, error) {
 	f, err := parser.ParseBytes(doc, 0)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to parse tag")
+		return nil, errors.Wrapf(err, "failed to parse yaml")
 	}
 	for _, docNode := range f.Docs {
 		if docNode.Body != nil {
@@ -226,7 +226,7 @@ func (e *Encoder) encodeByMarshaler(ctx context.Context, v reflect.Value, column
 			}
 			doc, err := JSONToYAML(jsonBytes)
 			if err != nil {
-				return nil, errors.Wrapf(err, "failed to convert json to tag")
+				return nil, errors.Wrapf(err, "failed to convert json to yaml")
 			}
 			node, err := e.encodeDocument(doc)
 			if err != nil {

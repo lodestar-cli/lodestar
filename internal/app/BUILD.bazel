@@ -8,6 +8,7 @@ go_library(
         "promote.go",
         "push.go",
         "show.go",
+        "state.go",
     ],
     importpath = "github.com/lodestar-cli/lodestar/internal/app",
     visibility = ["//:__subpackages__"],
@@ -16,6 +17,8 @@ go_library(
         "//internal/common/lodestarDir",
         "//internal/common/repo",
         "//internal/common/tag",
-        "//vendor/github.com/goccy/go-tag",
+        "//vendor/github.com/go-git/go-billy/v5:go-billy",
+        "//vendor/github.com/go-git/go-git/v5:go-git",
+        "//vendor/github.com/goccy/go-yaml",
     ],
 )

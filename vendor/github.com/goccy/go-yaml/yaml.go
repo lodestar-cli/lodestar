@@ -25,7 +25,7 @@ type BytesMarshalerContext interface {
 	MarshalYAML(context.Context) ([]byte, error)
 }
 
-// InterfaceMarshaler interface has MarshalYAML compatible with github.com/go-tag/tag package.
+// InterfaceMarshaler interface has MarshalYAML compatible with github.com/go-yaml/yaml package.
 type InterfaceMarshaler interface {
 	MarshalYAML() (interface{}, error)
 }
@@ -46,7 +46,7 @@ type BytesUnmarshalerContext interface {
 	UnmarshalYAML(context.Context, []byte) error
 }
 
-// InterfaceUnmarshaler interface has UnmarshalYAML compatible with github.com/go-tag/tag package.
+// InterfaceUnmarshaler interface has UnmarshalYAML compatible with github.com/go-yaml/yaml package.
 type InterfaceUnmarshaler interface {
 	UnmarshalYAML(func(interface{}) error) error
 }
@@ -80,14 +80,14 @@ func (s MapSlice) ToMap() map[interface{}]interface{} {
 //
 // Struct fields are only marshalled if they are exported (have an upper case
 // first letter), and are marshalled using the field name lowercased as the
-// default key. Custom keys may be defined via the "tag" name in the field
+// default key. Custom keys may be defined via the "yaml" name in the field
 // tag: the content preceding the first comma is used as the key, and the
 // following comma-separated options are used to tweak the marshalling process.
 // Conflicting names result in a runtime error.
 //
 // The field tag format accepted is:
 //
-//     `(...) tag:"[<key>][,<flag1>[,<flag2>]]" (...)`
+//     `(...) yaml:"[<key>][,<flag1>[,<flag2>]]" (...)`
 //
 // The following flags are currently supported:
 //
@@ -104,7 +104,7 @@ func (s MapSlice) ToMap() map[interface{}]interface{} {
 //     inline       Inline the field, which must be a struct or a map,
 //                  causing all of its fields or keys to be processed as if
 //                  they were part of the outer struct. For maps, keys must
-//                  not conflict with the tag keys of other struct fields.
+//                  not conflict with the yaml keys of other struct fields.
 //
 //     anchor       Marshal with anchor. If want to define anchor name explicitly, use anchor=name style.
 //                  Otherwise, if used 'anchor' name only, used the field name lowercased as the anchor name
@@ -118,7 +118,7 @@ func (s MapSlice) ToMap() map[interface{}]interface{} {
 // For example:
 //
 //     type T struct {
-//         F int `tag:"a,omitempty"`
+//         F int `yaml:"a,omitempty"`
 //         B int
 //     }
 //     yaml.Marshal(&T{B: 2}) // Returns "b: 2\n"
@@ -158,7 +158,7 @@ func ValueToNode(v interface{}, opts ...EncodeOption) (ast.Node, error) {
 // Struct fields are only unmarshalled if they are exported (have an
 // upper case first letter), and are unmarshalled using the field name
 // lowercased as the default key. Custom keys may be defined via the
-// "tag" name in the field tag: the content preceding the first comma
+// "yaml" name in the field tag: the content preceding the first comma
 // is used as the key, and the following comma-separated options are
 // used to tweak the marshalling process (see Marshal).
 // Conflicting names result in a runtime error.
@@ -166,7 +166,7 @@ func ValueToNode(v interface{}, opts ...EncodeOption) (ast.Node, error) {
 // For example:
 //
 //     type T struct {
-//         F int `tag:"a,omitempty"`
+//         F int `yaml:"a,omitempty"`
 //         B int
 //     }
 //     var t T

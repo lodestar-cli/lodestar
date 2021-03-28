@@ -33,7 +33,7 @@ func ReferenceDirs(dirs ...string) DecodeOption {
 	}
 }
 
-// RecursiveDir search tag file recursively from passed dirs by ReferenceDirs option
+// RecursiveDir search yaml file recursively from passed dirs by ReferenceDirs option
 func RecursiveDir(isRecursive bool) DecodeOption {
 	return func(d *Decoder) error {
 		d.isRecursiveDir = isRecursive

@@ -7,7 +7,6 @@ go_library(
     visibility = ["//visibility:private"],
     deps = [
         "//internal/app",
-        "//internal/common/lodestarDir",
         "//vendor/github.com/urfave/cli/v2:cli",
     ],
 )

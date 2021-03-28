@@ -6,11 +6,11 @@ go_library(
         "context.go",
         "scanner.go",
     ],
-    importmap = "github.com/lodestar-cli/lodestar/vendor/github.com/goccy/go-tag/scanner",
-    importpath = "github.com/goccy/go-tag/scanner",
+    importmap = "github.com/lodestar-cli/lodestar/vendor/github.com/goccy/go-yaml/scanner",
+    importpath = "github.com/goccy/go-yaml/scanner",
     visibility = ["//visibility:public"],
     deps = [
-        "//vendor/github.com/goccy/go-tag/token",
+        "//vendor/github.com/goccy/go-yaml/token",
         "//vendor/golang.org/x/xerrors",
     ],
 )

@@ -3,11 +3,11 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library")
 go_library(
     name = "lexer",
     srcs = ["lexer.go"],
-    importmap = "github.com/lodestar-cli/lodestar/vendor/github.com/goccy/go-tag/lexer",
-    importpath = "github.com/goccy/go-tag/lexer",
+    importmap = "github.com/lodestar-cli/lodestar/vendor/github.com/goccy/go-yaml/lexer",
+    importpath = "github.com/goccy/go-yaml/lexer",
     visibility = ["//visibility:public"],
     deps = [
-        "//vendor/github.com/goccy/go-tag/scanner",
-        "//vendor/github.com/goccy/go-tag/token",
+        "//vendor/github.com/goccy/go-yaml/scanner",
+        "//vendor/github.com/goccy/go-yaml/token",
     ],
 )

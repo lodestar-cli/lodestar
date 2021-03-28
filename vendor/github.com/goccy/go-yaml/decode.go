@@ -582,7 +582,7 @@ func (d *Decoder) decodeByUnmarshaler(ctx context.Context, dst reflect.Value, sr
 		if unmarshaler, ok := iface.(jsonUnmarshaler); ok {
 			jsonBytes, err := YAMLToJSON(d.unmarshalableDocument(src))
 			if err != nil {
-				return errors.Wrapf(err, "failed to convert tag to json")
+				return errors.Wrapf(err, "failed to convert yaml to json")
 			}
 			jsonBytes = bytes.TrimRight(jsonBytes, "\n")
 			if err := unmarshaler.UnmarshalJSON(jsonBytes); err != nil {
@@ -1302,7 +1302,7 @@ func (d *Decoder) isYAMLFile(file string) bool {
 	if ext == ".yml" {
 		return true
 	}
-	if ext == ".tag" {
+	if ext == ".yaml" {
 		return true
 	}
 	return false
@@ -1392,7 +1392,7 @@ func (d *Decoder) resolveReference() error {
 func (d *Decoder) parse(bytes []byte) (*ast.File, error) {
 	f, err := parser.ParseBytes(bytes, 0)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to parse tag")
+		return nil, errors.Wrapf(err, "failed to parse yaml")
 	}
 	normalizedFile := &ast.File{}
 	for _, doc := range f.Docs {

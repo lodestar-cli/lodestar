@@ -1,15 +1,15 @@
 # YAML support for the Go language
 
-[![PkgGoDev](https://pkg.go.dev/badge/github.com/goccy/go-tag)](https://pkg.go.dev/github.com/goccy/go-tag)
-[![CircleCI](https://circleci.com/gh/goccy/go-tag.svg?style=shield)](https://circleci.com/gh/goccy/go-tag)
-[![codecov](https://codecov.io/gh/goccy/go-tag/branch/master/graph/badge.svg)](https://codecov.io/gh/goccy/go-tag)
-[![Go Report Card](https://goreportcard.com/badge/github.com/goccy/go-tag)](https://goreportcard.com/report/github.com/goccy/go-tag)
+[![PkgGoDev](https://pkg.go.dev/badge/github.com/goccy/go-yaml)](https://pkg.go.dev/github.com/goccy/go-yaml)
+[![CircleCI](https://circleci.com/gh/goccy/go-yaml.svg?style=shield)](https://circleci.com/gh/goccy/go-yaml)
+[![codecov](https://codecov.io/gh/goccy/go-yaml/branch/master/graph/badge.svg)](https://codecov.io/gh/goccy/go-yaml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/goccy/go-yaml)](https://goreportcard.com/report/github.com/goccy/go-yaml)
 
 <img width="300px" src="https://user-images.githubusercontent.com/209884/67159116-64d94b80-f37b-11e9-9b28-f8379636a43c.png"></img>
 
 # Why a new library?
 
-As of this writing, there already exists a defacto standard library for YAML processing Go: [https://github.com/go-tag/tag](https://github.com/go-tag/tag). However we feel that some features are lacking, namely:
+As of this writing, there already exists a defacto standard library for YAML processing Go: [https://github.com/go-yaml/yaml](https://github.com/go-yaml/yaml). However we feel that some features are lacking, namely:
 
 - Pretty format for error notifications
 - Directly manipulate the YAML abstract syntax tree
@@ -27,14 +27,14 @@ As of this writing, there already exists a defacto standard library for YAML pro
 # Installation
 
 ```sh
-go get -u github.com/goccy/go-tag
+go get -u github.com/goccy/go-yaml
 ```
 
 # Synopsis
 
 ## 1. Simple Encode/Decode
 
-Support compatible interface to `go-tag/tag` by using `reflect`
+Support compatible interface to `go-yaml/yaml` by using `reflect`
 
 ```go
 var v struct {
@@ -43,7 +43,7 @@ var v struct {
 }
 v.A = 1
 v.B = "hello"
-bytes, err := tag.Marshal(v)
+bytes, err := yaml.Marshal(v)
 if err != nil {
 	//...
 }
@@ -61,12 +61,12 @@ var v struct {
 	A int
 	B string
 }
-if err := tag.Unmarshal([]byte(yml), &v); err != nil {
+if err := yaml.Unmarshal([]byte(yml), &v); err != nil {
 	//...
 }
 ```
 
-To control marshal/unmarshal behavior, you can use the `tag` tag
+To control marshal/unmarshal behavior, you can use the `yaml` tag
 
 ```go
 	yml := `---
@@ -74,17 +74,17 @@ foo: 1
 bar: c
 `
 var v struct {
-	A int    `tag:"foo"`
-	B string `tag:"bar"`
+	A int    `yaml:"foo"`
+	B string `yaml:"bar"`
 }
-if err := tag.Unmarshal([]byte(yml), &v); err != nil {
+if err := yaml.Unmarshal([]byte(yml), &v); err != nil {
 	//...
 }
 ```
 
 For convenience, we also accept the `json` tag. Note that not all options from
 the `json` tag will have significance when parsing YAML documents. If both
-tags exist, `tag` tag will take precedence.
+tags exist, `yaml` tag will take precedence.
 
 ```go
 	yml := `---
@@ -95,12 +95,12 @@ var v struct {
 	A int    `json:"foo"`
 	B string `json:"bar"`
 }
-if err := tag.Unmarshal([]byte(yml), &v); err != nil {
+if err := yaml.Unmarshal([]byte(yml), &v); err != nil {
 	//...
 }
 ```
 
-For custom marshal/unmarshaling, implement either `Bytes` or `Interface` variant of marshaler/unmarshaler. The difference is that while `BytesMarshaler`/`BytesUnmarshaler` behaves like [`encoding/json`](https://pkg.go.dev/encoding/json) and `InterfaceMarshaler`/`InterfaceUnmarshaler` behaves like [`gopkg.in/tag.v2`](https://pkg.go.dev/gopkg.in/tag.v2).
+For custom marshal/unmarshaling, implement either `Bytes` or `Interface` variant of marshaler/unmarshaler. The difference is that while `BytesMarshaler`/`BytesUnmarshaler` behaves like [`encoding/json`](https://pkg.go.dev/encoding/json) and `InterfaceMarshaler`/`InterfaceUnmarshaler` behaves like [`gopkg.in/yaml.v2`](https://pkg.go.dev/gopkg.in/yaml.v2).
 
 Semantically both are the same, but they differ in performance. Because indentation matter in YAML, you cannot simply accept a valid YAML fragment from a Marshaler, and expect it to work when it is attached to the parent container's serialized form. Therefore when we receive use the `BytesMarshaler`, which returns `[]byte`, we must decode it once to figure out how to make it work in the given context. If you use the `InterfaceMarshaler`, we can skip the decoding.
 
@@ -120,18 +120,18 @@ code.
 
 And `anchor.yml` is defined the following.
 
-```tag
+```yaml
 a: &a
   b: 1
   c: hello
 ```
 
-Then, if `tag.ReferenceDirs("testdata")` option passed to `tag.Decoder`, 
+Then, if `yaml.ReferenceDirs("testdata")` option passed to `yaml.Decoder`, 
  `Decoder` try to find anchor definition from YAML files the under `testdata` directory.
  
 ```go
 buf := bytes.NewBufferString("a: *a\n")
-dec := tag.NewDecoder(buf, tag.ReferenceDirs("testdata"))
+dec := yaml.NewDecoder(buf, yaml.ReferenceDirs("testdata"))
 var v struct {
 	A struct {
 		B int
@@ -156,12 +156,12 @@ type T struct {
   B string
 }
 var v struct {
-  C *T `tag:"c,anchor=x"`
-  D *T `tag:"d,alias=x"`
+  C *T `yaml:"c,anchor=x"`
+  D *T `yaml:"d,alias=x"`
 }
 v.C = &T{A: 1, B: "hello"}
 v.D = v.C
-bytes, err := tag.Marshal(v)
+bytes, err := yaml.Marshal(v)
 if err != nil {
   panic(err)
 }
@@ -189,16 +189,16 @@ type T struct {
 	S string
 }
 var v struct {
-	A *T `tag:"a,anchor"`
-	B *T `tag:"b,anchor"`
-	C *T `tag:"c,alias"`
-	D *T `tag:"d,alias"`
+	A *T `yaml:"a,anchor"`
+	B *T `yaml:"b,anchor"`
+	C *T `yaml:"c,alias"`
+	D *T `yaml:"d,alias"`
 }
 v.A = &T{I: 1, S: "hello"}
 v.B = &T{I: 2, S: "world"}
 v.C = v.A // C has same pointer address to A
 v.D = v.B // D has same pointer address to B
-bytes, err := tag.Marshal(v)
+bytes, err := yaml.Marshal(v)
 if err != nil {
 	//...
 }
@@ -221,9 +221,9 @@ Merge key and alias ( `<<: *alias` ) can be used by embedding a structure with t
 
 ```go
 type Person struct {
-	*Person `tag:",omitempty,inline,alias"` // embed Person type for default value
-	Name    string `tag:",omitempty"`
-	Age     int    `tag:",omitempty"`
+	*Person `yaml:",omitempty,inline,alias"` // embed Person type for default value
+	Name    string `yaml:",omitempty"`
+	Age     int    `yaml:",omitempty"`
 }
 defaultPerson := &Person{
 	Name: "John Smith",
@@ -240,12 +240,12 @@ people := []*Person{
 	},
 }
 var doc struct {
-	Default *Person   `tag:"default,anchor"`
-	People  []*Person `tag:"people"`
+	Default *Person   `yaml:"default,anchor"`
+	People  []*Person `yaml:"people"`
 }
 doc.Default = defaultPerson
 doc.People = people
-bytes, err := tag.Marshal(doc)
+bytes, err := yaml.Marshal(doc)
 if err != nil {
 	//...
 }
@@ -273,7 +273,7 @@ from the source YAML document, to make it easier finding the error location.
 Second, the error messages can optionally be colorized.
 
 If you would like to control exactly how the output looks like, consider
-using  `tag.FormatError`, which accepts two boolean values to
+using  `yaml.FormatError`, which accepts two boolean values to
 control turning on/off these features
 
 <img src="https://user-images.githubusercontent.com/209884/67358124-587f0980-f59a-11e9-96fc-7205aab77695.png"></img>
@@ -292,7 +292,7 @@ store:
     color: red
     price: 19.95
 `
-path, err := tag.PathString("$.store.book[*].author")
+path, err := yaml.PathString("$.store.book[*].author")
 if err != nil {
   //...
 }
@@ -312,7 +312,7 @@ package main
 import (
   "fmt"
 
-  "github.com/goccy/go-tag"
+  "github.com/goccy/go-yaml"
 )
 
 func main() {
@@ -324,12 +324,12 @@ b: "hello"
     A int
     B string
   }
-  if err := tag.Unmarshal([]byte(yml), &v); err != nil {
+  if err := yaml.Unmarshal([]byte(yml), &v); err != nil {
     panic(err)
   }
   if v.A != 2 {
     // output error with YAML source
-    path, err := tag.PathString("$.a")
+    path, err := yaml.PathString("$.a")
     if err != nil {
       panic(err)
     }
@@ -351,14 +351,14 @@ output result is the following.
 
 ## ycat 
 
-print tag file with color
+print yaml file with color
 
 <img width="713" alt="ycat" src="https://user-images.githubusercontent.com/209884/66986084-19b00600-f0f9-11e9-9f0e-1f91eb072fe0.png">
 
 ### Installation
 
 ```sh
-go get -u github.com/goccy/go-tag/cmd/ycat
+go get -u github.com/goccy/go-yaml/cmd/ycat
 ```
 
 # License

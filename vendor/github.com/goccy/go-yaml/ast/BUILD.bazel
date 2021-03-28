@@ -3,11 +3,11 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library")
 go_library(
     name = "ast",
     srcs = ["ast.go"],
-    importmap = "github.com/lodestar-cli/lodestar/vendor/github.com/goccy/go-tag/ast",
-    importpath = "github.com/goccy/go-tag/ast",
+    importmap = "github.com/lodestar-cli/lodestar/vendor/github.com/goccy/go-yaml/ast",
+    importpath = "github.com/goccy/go-yaml/ast",
     visibility = ["//visibility:public"],
     deps = [
-        "//vendor/github.com/goccy/go-tag/token",
+        "//vendor/github.com/goccy/go-yaml/token",
         "//vendor/golang.org/x/xerrors",
     ],
 )
