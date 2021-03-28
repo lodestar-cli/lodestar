@@ -16,10 +16,11 @@ func main() {
 	var appConfigPath string
 	var destEnv string
 	var environment string
+	var outputState bool
 
 	app := &cli.App{
 		Name: "lodestar",
-		Version: "0.1.0",
+		Version: "0.1.1",
 		Usage: "Help guide your applications through their environments",
 		Commands: []*cli.Command{
 			{
@@ -28,7 +29,7 @@ func main() {
 				Subcommands: []*cli.Command{
 					{
 						Name:  "push",
-						Usage: "Update an App Environment's configuration file with new tag",
+						Usage: "Push a new image tag to an Environment",
 						UsageText: "In order to push a tag to an environment, either a name for an App configured in ~/.lodestar\n\t"+
 							       " needs to be provided with --name, or a path to an app needs to be provided with --config-path.\n\t"+
 							       " Lodestar will then be able to find the App and pass the tag to the correct environment.",
@@ -74,9 +75,14 @@ func main() {
 								Required: true,
 								Destination: &tag,
 							},
+							&cli.BoolFlag{
+								Name: "output-state",
+								Usage: "will create a local yaml file of the updated app state when set",
+								Destination: &outputState,
+							},
 						},
 						Action: func(c *cli.Context) error {
-							err := app.Push(username,token,name,appConfigPath,environment,tag)
+							err := app.Push(username,token,name,appConfigPath,environment,tag, outputState)
 							if err != nil {
 								return err
 							}
@@ -85,7 +91,7 @@ func main() {
 					},
 					{
 						Name:  "promote",
-						Usage: "promote an image tag to the next environment",
+						Usage: "Promote an image tag to the next environment",
 						UsageText: "In order to promote an environment's tag, either a name for an App configured in ~/.lodestar\n\t"+
 							" needs to be provided with --name, or a path to an app needs to be provided with --config-path.\n\t"+
 							" Lodestar will then be able to find the App and pass the tag to the correct environment.",
@@ -128,9 +134,14 @@ func main() {
 								Required: true,
 								Destination: &destEnv,
 							},
+							&cli.BoolFlag{
+								Name: "output-state",
+								Usage: "will create a local yaml file of the updated app state when set",
+								Destination: &outputState,
+							},
 						},
 						Action: func(c *cli.Context) error {
-							err := app.Promote(username,token,name,appConfigPath,srcEnv,destEnv)
+							err := app.Promote(username,token,name,appConfigPath,srcEnv,destEnv,outputState)
 							if err != nil {
 								return err
 							}
@@ -139,7 +150,9 @@ func main() {
 					},
 					{
 						Name:  "list",
-						Usage: "list all Apps in current context",
+						Usage: "List current context Apps",
+						UsageText: "Will provide all the Apps within the current context as well as a description of the app.\n\t"+
+							" App names and descriptions come directly from the appInfo block in their respective App configuration file.",
 						Action: func(c *cli.Context) error {
 							err := app.List()
 							return err
@@ -147,7 +160,7 @@ func main() {
 					},
 					{
 						Name:  "show",
-						Usage: "prints the configuration file for the specified App",
+						Usage: "Prints the configuration file for the specified App",
 						Flags: []cli.Flag{
 							&cli.StringFlag{
 								Name:        "name",

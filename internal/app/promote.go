@@ -3,13 +3,14 @@ package app
 import (
 	"errors"
 	"fmt"
+	"github.com/go-git/go-billy/v5"
 	auth "github.com/lodestar-cli/lodestar/internal/common/auth"
 	"github.com/lodestar-cli/lodestar/internal/common/lodestarDir"
 	repo "github.com/lodestar-cli/lodestar/internal/common/repo"
 	tag "github.com/lodestar-cli/lodestar/internal/common/tag"
 )
 
-func Promote(username string, token string, name string, configPath string, srcEnv string, destEnv string) error {
+func Promote(username string, token string, name string, configPath string, srcEnv string, destEnv string, output bool) error {
 	var config *LodestarAppConfig
 	var srcPath string
 	var destPath string
@@ -34,7 +35,7 @@ func Promote(username string, token string, name string, configPath string, srcE
 				break
 			}
 		}
-		err = promote(username,token,config.AppInfo.RepoUrl,srcPath,destPath)
+		err = promote(username,token,config.AppInfo.RepoUrl,srcPath,destPath, destEnv, config.AppInfo.StatePath, output)
 		return err
 	} else {
 		path, err := lodestarDir.GetConfigPath("app", name)
@@ -60,13 +61,14 @@ func Promote(username string, token string, name string, configPath string, srcE
 				break
 			}
 		}
-		err = promote(username,token,config.AppInfo.RepoUrl,srcPath,destPath)
+		err = promote(username,token,config.AppInfo.RepoUrl,srcPath,destPath, destEnv, config.AppInfo.StatePath, output)
 		return err
 	}
 }
 
 
-func promote(username string, token string, url string, srcPath string, destPath string) error {
+func promote(username string, token string, url string, srcPath string, destPath string, destEnv string, statePath string, output bool) error {
+	var fs billy.Filesystem
 
 	auth, err := auth.CreateAuth(username, token)
 	if err != nil {
@@ -74,13 +76,18 @@ func promote(username string, token string, url string, srcPath string, destPath
 	}
 
 	fmt.Printf("Cloning %s as %s...\n", url, username)
-	repository, err := repo.GetRepository(url, auth)
+	repository, fs, err := repo.GetRepository(url, auth)
+	if err != nil {
+		return err
+	}
+
+	stateGraph, err := GetEnvironmentStateGraph(fs, statePath)
 	if err != nil {
 		return err
 	}
 
 	fmt.Printf("Retrieving tag from configuration file %s...\n",srcPath)
-	src, err := repo.GetFileContent(srcPath)
+	src, err := repo.GetFileString(fs, srcPath)
 	if err != nil {
 		return err
 	}
@@ -88,7 +95,7 @@ func promote(username string, token string, url string, srcPath string, destPath
 	if err != nil {
 		return err
 	}
-	dest, err := repo.GetFileContent(destPath)
+	dest, err := repo.GetFileString(fs, destPath)
 	if err != nil {
 		return err
 	}
@@ -97,19 +104,40 @@ func promote(username string, token string, url string, srcPath string, destPath
 		return err
 	}
 
+	m, err := CompareEnvironmentStateTag(stateGraph, destEnv, newTag)
+	if err != nil {
+		return err
+	}
+	if !m{
+		return nil
+	}
+
 	fmt.Printf("Updating %s to %s at %s...\n",oldTag,newTag, destPath)
 	newConfig, err := tag.Replace(dest, newTag)
 	if err != nil {
 		return err
 	}
 
+	repository, stateGraph, err = UpdateEnvironmentStateTag(fs, repository, stateGraph, statePath, destEnv, newTag)
+	if err != nil {
+		return err
+	}
+
 	fmt.Printf("Pushing changes to %s as %s...\n",url,username)
-	err = repo.UpdateAndPush(repository, destPath, newConfig, auth, oldTag, newTag)
+	err = repo.UpdateAndPush(fs,repository, destPath, newConfig, auth, oldTag, newTag)
 	if err != nil {
 		return err
 	}
 
 	fmt.Println("Promote complete!")
+
+	if output {
+		err = OutputEnvironmentStateGraph(stateGraph)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 
 }

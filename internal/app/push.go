@@ -3,14 +3,14 @@ package app
 import (
 	"errors"
 	"fmt"
+	"github.com/go-git/go-billy/v5"
 	auth "github.com/lodestar-cli/lodestar/internal/common/auth"
 	"github.com/lodestar-cli/lodestar/internal/common/lodestarDir"
 	repo "github.com/lodestar-cli/lodestar/internal/common/repo"
-	 tag "github.com/lodestar-cli/lodestar/internal/common/tag"
-
+	tag "github.com/lodestar-cli/lodestar/internal/common/tag"
 )
 
-func Push(username string, to string, name string, configPath string, environment string, t string) error {
+func Push(username string, to string, name string, configPath string, environment string, t string, output bool) error {
 	var config *LodestarAppConfig
 
 	if name == "" && configPath == "" {
@@ -26,7 +26,7 @@ func Push(username string, to string, name string, configPath string, environmen
 
 		for _, env := range config.EnvGraph {
 			if env.Name == environment {
-				err := push(username, to, config.AppInfo.RepoUrl, env.SrcPath, t)
+				err := push(username, to, config.AppInfo.RepoUrl, environment, env.SrcPath, config.AppInfo.StatePath, t, output)
 				if err != nil {
 					return err
 				}
@@ -50,7 +50,7 @@ func Push(username string, to string, name string, configPath string, environmen
 
 		for _, env := range config.EnvGraph {
 			if env.Name == environment {
-				err := push(username, to, config.AppInfo.RepoUrl, env.SrcPath, t)
+				err := push(username, to, config.AppInfo.RepoUrl, environment ,env.SrcPath, config.AppInfo.StatePath, t, output)
 				if err != nil {
 					return err
 				}
@@ -61,20 +61,35 @@ func Push(username string, to string, name string, configPath string, environmen
 	}
 }
 
-func push(username string, token string, url string, configPath string, t string) error {
+func push(username string, token string, url string, environment string, configPath string, statePath string, t string, output bool) error {
+	var fs billy.Filesystem
 
 	auth, err := auth.CreateAuth(username, token)
 	if err != nil {
 		return err
 	}
+
 	fmt.Printf("Cloning %s as %s...\n", url, username)
-	repository, err := repo.GetRepository(url, auth)
+	repository, fs, err := repo.GetRepository(url, auth)
 	if err != nil {
 		return err
 	}
 
+	stateGraph, err := GetEnvironmentStateGraph(fs, statePath)
+	if err != nil {
+		return err
+	}
+
+	m, err := CompareEnvironmentStateTag(stateGraph, environment, t)
+	if err != nil {
+		return err
+	}
+	if !m{
+		return nil
+	}
+
 	fmt.Printf("Retrieving environment configuration at %s...\n", configPath)
-	values, err := repo.GetFileContent(configPath)
+	values, err := repo.GetFileString(fs, configPath)
 	if err != nil {
 		return err
 	}
@@ -90,13 +105,26 @@ func push(username string, token string, url string, configPath string, t string
 		return err
 	}
 
+	repository, stateGraph, err = UpdateEnvironmentStateTag(fs, repository, stateGraph, statePath, environment, t)
+	if err != nil {
+		return err
+	}
+
 	fmt.Printf("Pushing changes to %s as %s...\n",url,username)
-	err = repo.UpdateAndPush(repository, configPath, newConfig, auth, oldTag, t)
+
+	err = repo.UpdateAndPush(fs, repository, configPath, newConfig, auth, oldTag, t)
 	if err != nil {
 		return err
 	}
 
 	fmt.Println("Push complete!")
-	return nil
 
+	if output {
+		err = OutputEnvironmentStateGraph(stateGraph)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
