@@ -3,14 +3,19 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library")
 go_library(
     name = "app",
     srcs = [
+        "appConfig.go",
+        "list.go",
         "promote.go",
         "push.go",
+        "show.go",
     ],
     importpath = "github.com/lodestar-cli/lodestar/internal/app",
     visibility = ["//:__subpackages__"],
     deps = [
         "//internal/common/auth",
+        "//internal/common/lodestarDir",
         "//internal/common/repo",
         "//internal/common/yaml",
+        "//vendor/github.com/goccy/go-yaml",
     ],
 )
