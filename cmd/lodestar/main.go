@@ -3,11 +3,11 @@ package main
 import (
 	"errors"
 	"fmt"
-	app "github.com/lodestar-cli/lodestar/internal/app"
-	"github.com/urfave/cli/v2"
-	lodestarDir "github.com/lodestar-cli/lodestar/internal/common/lodestarDir"
 	"log"
 	"os"
+	"github.com/urfave/cli/v2"
+	app "github.com/lodestar-cli/lodestar/internal/app"
+	lodestarDir "github.com/lodestar-cli/lodestar/internal/common/lodestarDir"
 )
 
 func main() {
@@ -132,7 +132,9 @@ func main() {
 					{
 						Name:  "promote",
 						Usage: "promote an image tag to the next environment",
-						UsageText: "Retrieves an application tag specified in a source environment configuration file, and promotes it to a destination configuration file",
+						UsageText: "In order to promote an environment's tag, either a name for an App configured in ~/.lodestar\n\t"+
+							" needs to be provided with --name, or a path to an app needs to be provided with --config-path.\n\t"+
+							" Lodestar will then be able to find the App and pass the tag to the correct environment.",
 						Flags: []cli.Flag {
 							&cli.StringFlag{
 								Name: "username",
