@@ -5,20 +5,20 @@ import (
 )
 
 type appEnvironment struct {
-	Name string `tag:"name"`
-	SrcPath string `tag:"srcPath"`
+	Name string `yaml:"name"`
+	SrcPath string `yaml:"srcPath"`
 }
 
 type LodestarAppConfig struct {
 	AppInfo struct {
-		Name string   `tag:"name"`
-		Type string `tag:"type"`
-		Description string `tag:"description"`
-		RepoUrl string `tag:"repoUrl"`
-		Target string `tag:"target"`
-		StatePath string `tag:"statePath"`
-	} `tag:"appInfo"`
-	EnvGraph []appEnvironment `tag:"envGraph,flow"`
+		Name string   `yaml:"name"`
+		Type string `yaml:"type"`
+		Description string `yaml:"description"`
+		RepoUrl string `yaml:"repoUrl"`
+		Target string `yaml:"target"`
+		StatePath string `yaml:"statePath"`
+	} `yaml:"appInfo"`
+	EnvGraph []appEnvironment `yaml:"envGraph,flow"`
 }
 
 

@@ -101,13 +101,13 @@ func UpdateEnvironmentStateTag(fs billy.Filesystem, repository *git.Repository, 
 	return repository, stateGraph, nil
 }
 
-func OutputEnvironmentStateGraph(stateGraph *LodestarAppStateConfig) error{
+func OutputEnvironmentStateGraph(stateGraph *LodestarAppStateConfig, name string) error{
 	s ,err := yaml.Marshal(stateGraph)
 	if err != nil {
 		return err
 	}
-
-	err = ioutil.WriteFile("state.yaml", s, 0755)
+	
+	err = ioutil.WriteFile(name+"-state.yaml", s, 0755)
 	if err != nil {
 		return err
 	}

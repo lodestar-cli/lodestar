@@ -165,12 +165,16 @@ func main() {
 							&cli.StringFlag{
 								Name:        "name",
 								Usage:       "the `name` of the app",
-								Required:    true,
 								Destination: &name,
+							},
+							&cli.StringFlag{
+								Name: "config-path",
+								Usage: "the `path` to the app configuration file",
+								Destination: &appConfigPath,
 							},
 						},
 						Action: func(c *cli.Context) error {
-							err := app.Show(name)
+							err := app.Show(name, appConfigPath)
 							return err
 						},
 					},

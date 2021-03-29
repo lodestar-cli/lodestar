@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/go-git/go-billy/v5"
+	"github.com/goccy/go-yaml"
 	auth "github.com/lodestar-cli/lodestar/internal/common/auth"
 	"github.com/lodestar-cli/lodestar/internal/common/lodestarDir"
 	repo "github.com/lodestar-cli/lodestar/internal/common/repo"
@@ -35,7 +36,7 @@ func Promote(username string, token string, name string, configPath string, srcE
 				break
 			}
 		}
-		err = promote(username,token,config.AppInfo.RepoUrl,srcPath,destPath, destEnv, config.AppInfo.StatePath, output)
+		err = promote(username,token,config.AppInfo.RepoUrl,srcPath,destPath, destEnv, config.AppInfo.StatePath, config.AppInfo.Name, output)
 		return err
 	} else {
 		path, err := lodestarDir.GetConfigPath("app", name)
@@ -61,13 +62,13 @@ func Promote(username string, token string, name string, configPath string, srcE
 				break
 			}
 		}
-		err = promote(username,token,config.AppInfo.RepoUrl,srcPath,destPath, destEnv, config.AppInfo.StatePath, output)
+		err = promote(username,token,config.AppInfo.RepoUrl,srcPath,destPath, destEnv, config.AppInfo.StatePath, config.AppInfo.Name, output)
 		return err
 	}
 }
 
 
-func promote(username string, token string, url string, srcPath string, destPath string, destEnv string, statePath string, output bool) error {
+func promote(username string, token string, url string, srcPath string, destPath string, destEnv string, statePath string, name string, output bool) error {
 	var fs billy.Filesystem
 
 	auth, err := auth.CreateAuth(username, token)
@@ -109,6 +110,19 @@ func promote(username string, token string, url string, srcPath string, destPath
 		return err
 	}
 	if !m{
+		if output {
+			err = OutputEnvironmentStateGraph(stateGraph, name)
+			if err != nil {
+				return err
+			}
+		}
+
+		s, err := yaml.Marshal(stateGraph)
+		if err != nil {
+			return err
+		}
+		fmt.Println(string(s))
+
 		return nil
 	}
 
@@ -132,11 +146,17 @@ func promote(username string, token string, url string, srcPath string, destPath
 	fmt.Println("Promote complete!")
 
 	if output {
-		err = OutputEnvironmentStateGraph(stateGraph)
+		err = OutputEnvironmentStateGraph(stateGraph, name)
 		if err != nil {
 			return err
 		}
 	}
+
+	s, err := yaml.Marshal(stateGraph)
+	if err != nil {
+		return err
+	}
+	fmt.Println(string(s))
 
 	return nil
 

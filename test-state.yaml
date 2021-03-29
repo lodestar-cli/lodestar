@@ -1,0 +1,9 @@
+state:
+- environment: dev
+  tag: 4567qqxyz
+- environment: qa
+  tag: 4567qqxyz
+- environment: staging
+  tag: 4567qqxyz
+- environment: production
+  tag: v1.2.3

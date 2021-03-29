@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/go-git/go-billy/v5"
+	"github.com/goccy/go-yaml"
 	auth "github.com/lodestar-cli/lodestar/internal/common/auth"
 	"github.com/lodestar-cli/lodestar/internal/common/lodestarDir"
 	repo "github.com/lodestar-cli/lodestar/internal/common/repo"
@@ -26,7 +27,7 @@ func Push(username string, to string, name string, configPath string, environmen
 
 		for _, env := range config.EnvGraph {
 			if env.Name == environment {
-				err := push(username, to, config.AppInfo.RepoUrl, environment, env.SrcPath, config.AppInfo.StatePath, t, output)
+				err := push(username, to, config.AppInfo.RepoUrl, environment, env.SrcPath, config.AppInfo.StatePath, t, config.AppInfo.Name, output)
 				if err != nil {
 					return err
 				}
@@ -50,7 +51,7 @@ func Push(username string, to string, name string, configPath string, environmen
 
 		for _, env := range config.EnvGraph {
 			if env.Name == environment {
-				err := push(username, to, config.AppInfo.RepoUrl, environment ,env.SrcPath, config.AppInfo.StatePath, t, output)
+				err := push(username, to, config.AppInfo.RepoUrl, environment ,env.SrcPath, config.AppInfo.StatePath, t, config.AppInfo.Name, output)
 				if err != nil {
 					return err
 				}
@@ -61,7 +62,7 @@ func Push(username string, to string, name string, configPath string, environmen
 	}
 }
 
-func push(username string, token string, url string, environment string, configPath string, statePath string, t string, output bool) error {
+func push(username string, token string, url string, environment string, configPath string, statePath string, t string, name string, output bool) error {
 	var fs billy.Filesystem
 
 	auth, err := auth.CreateAuth(username, token)
@@ -85,6 +86,19 @@ func push(username string, token string, url string, environment string, configP
 		return err
 	}
 	if !m{
+		if output {
+			err = OutputEnvironmentStateGraph(stateGraph, name)
+			if err != nil {
+				return err
+			}
+		}
+
+		s, err := yaml.Marshal(stateGraph)
+		if err != nil {
+			return err
+		}
+		fmt.Println(string(s))
+
 		return nil
 	}
 
@@ -120,11 +134,17 @@ func push(username string, token string, url string, environment string, configP
 	fmt.Println("Push complete!")
 
 	if output {
-		err = OutputEnvironmentStateGraph(stateGraph)
+		err = OutputEnvironmentStateGraph(stateGraph, name)
 		if err != nil {
 			return err
 		}
 	}
+
+	s, err := yaml.Marshal(stateGraph)
+	if err != nil {
+		return err
+	}
+	fmt.Println(string(s))
 
 	return nil
 }
