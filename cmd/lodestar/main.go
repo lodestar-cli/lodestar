@@ -72,8 +72,8 @@ func main() {
 							&cli.StringFlag{
 								Name: "tag",
 								Usage: "the `tag` for the new image",
-								Required: true,
 								Destination: &tag,
+								EnvVars: []string{"IMAGE_TAG"},
 							},
 							&cli.BoolFlag{
 								Name: "output-state",
