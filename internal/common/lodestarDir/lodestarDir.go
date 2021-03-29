@@ -1,6 +1,7 @@
 package lodestarDir
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os/user"
 	"path"
@@ -33,6 +34,18 @@ func GetConfigFileNames(command string) ([]string, error){
 	}
 
 	return fileNames, nil
+}
+
+func AddConfig(content []byte, command string, commandName string) error {
+	path, err := GetConfigPath(command, commandName)
+
+	err = ioutil.WriteFile(path,content,644)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("Added config file at: "+path)
+	return nil
 }
 
 func GetConfigContent(path string) ([]byte, error){

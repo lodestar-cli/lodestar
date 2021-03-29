@@ -106,7 +106,7 @@ func OutputEnvironmentStateGraph(stateGraph *LodestarAppStateConfig, name string
 	if err != nil {
 		return err
 	}
-	
+
 	err = ioutil.WriteFile(name+"-state.yaml", s, 0755)
 	if err != nil {
 		return err

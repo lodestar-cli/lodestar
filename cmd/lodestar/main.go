@@ -20,7 +20,7 @@ func main() {
 
 	app := &cli.App{
 		Name: "lodestar",
-		Version: "0.1.1",
+		Version: "0.1.2",
 		Usage: "Help guide your applications through their environments",
 		Commands: []*cli.Command{
 			{
@@ -175,6 +175,21 @@ func main() {
 						},
 						Action: func(c *cli.Context) error {
 							err := app.Show(name, appConfigPath)
+							return err
+						},
+					},
+					{
+						Name:  "create",
+						Usage: "Create a Lodestar App",
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name: "config-path",
+								Usage: "the `path` to the app configuration file",
+								Destination: &appConfigPath,
+							},
+						},
+						Action: func(c *cli.Context) error {
+							err := app.Create()
 							return err
 						},
 					},
