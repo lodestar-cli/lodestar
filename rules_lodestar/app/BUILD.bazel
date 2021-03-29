@@ -2,6 +2,7 @@ load(":app.bzl", "app_push")
 
 app_push(
     name = "push_example",
+    lodestar = "//cmd/lodestar",
     app_config = "lodestar-folder-app-example.yaml",
     environment = "dev",
     tag = "$(tag)",
