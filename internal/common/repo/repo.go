@@ -1,12 +1,14 @@
 package repo
+
 import (
-	"fmt"
 	"context"
 	"github.com/go-git/go-billy/v5"
 	"github.com/go-git/go-billy/v5/memfs"
 	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/go-git/go-git/v5/storage/memory"
+	"time"
 )
 
 
@@ -15,10 +17,12 @@ func GetRepository(url string, auth *http.BasicAuth) (*git.Repository, billy.Fil
 		storer = memory.NewStorage()
 		fs     = memfs.New()
 	)
-	repository, err := git.CloneContext(context.TODO(),storer, fs, &git.CloneOptions{
-		URL:  url,
-		Auth: auth,
-	})
+
+	cloneOptions := new(git.CloneOptions)
+	cloneOptions.URL=url
+	cloneOptions.Auth=auth
+
+	repository, err := git.CloneContext(context.TODO(),storer, fs, cloneOptions)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -67,6 +71,7 @@ func GetFileByte(fs billy.Filesystem, path string) ([]byte, error){
 }
 
 func UpdateAndPush(fs billy.Filesystem, repository *git.Repository, configPath string, newConfig string, auth *http.BasicAuth, oldTag string, newTag string) error{
+
 	worktree, err := repository.Worktree()
 	if err != nil {
 		return err
@@ -92,17 +97,27 @@ func UpdateAndPush(fs billy.Filesystem, repository *git.Repository, configPath s
 		return err
 	}
 
-	_, err = worktree.Commit("Config file updated with Bazel: "+oldTag+" ---> "+newTag, &git.CommitOptions{})
+	//should be edited when context is added
+	signature := &object.Signature{
+		Name: auth.Username,
+		Email: auth.Username,
+		When: time.Now(),
+	}
+
+	_, err = worktree.Commit("Config file updated with Bazel: "+oldTag+" ---> "+newTag, &git.CommitOptions{
+		Author: signature,
+	})
 	if err != nil {
 		return err
 	}
 
-	err = repository.Push(&git.PushOptions{
+	pushOption := &git.PushOptions{
 		RemoteName: "origin",
-		Auth:       auth,
-	})
+		Auth: auth,
+	}
+
+	err = repository.Push(pushOption)
 	if err != nil {
-		fmt.Println(err)
 		return err
 	}
 

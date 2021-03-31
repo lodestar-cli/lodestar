@@ -9,6 +9,7 @@ go_library(
         "//vendor/github.com/go-git/go-billy/v5:go-billy",
         "//vendor/github.com/go-git/go-billy/v5/memfs",
         "//vendor/github.com/go-git/go-git/v5:go-git",
+        "//vendor/github.com/go-git/go-git/v5/plumbing/object",
         "//vendor/github.com/go-git/go-git/v5/plumbing/transport/http",
         "//vendor/github.com/go-git/go-git/v5/storage/memory",
     ],

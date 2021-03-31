@@ -6,10 +6,10 @@ import (
 
 func CreateAuth(username string, token string) (*http.BasicAuth, error) {
 
-	auth := &http.BasicAuth{
-		Username: username,
-		Password: token,
-	}
+	auth := new(http.BasicAuth)
+
+	auth.Username=username
+	auth.Password=token
 
 	return auth, nil
 }

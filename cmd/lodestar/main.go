@@ -98,16 +98,16 @@ func main() {
 						Flags: []cli.Flag {
 							&cli.StringFlag{
 								Name: "username",
-								Usage: "`username` for the version control account that can access the repository",
 								Hidden: true,
+								Usage: "`username` for the version control account that can access the repository",
 								Required: true,
 								Destination: &username,
 								EnvVars: []string{"GIT_USER"},
 							},
 							&cli.StringFlag{
 								Name: "token",
-								Usage: "`token` for the version control account that can access the repository",
 								Hidden: true,
+								Usage: "`token` for the version control account that can access the repository",
 								Required: true,
 								Destination: &token,
 								EnvVars: []string{"GIT_TOKEN"},
