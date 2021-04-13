@@ -1,6 +1,7 @@
 package repo
 
 import (
+	"bytes"
 	"context"
 	"github.com/go-git/go-billy/v5"
 	"github.com/go-git/go-billy/v5/memfs"
@@ -86,8 +87,10 @@ func UpdateAndPush(fs billy.Filesystem, repository *git.Repository, configPath s
 	if err != nil {
 		return err
 	}
-
-	_, err = configFile.Write([]byte(newConfig))
+	
+	b := []byte(newConfig)
+	b = bytes.Trim(b, "\x00")
+	_, err = configFile.Write(b)
 	if err != nil {
 		return err
 	}

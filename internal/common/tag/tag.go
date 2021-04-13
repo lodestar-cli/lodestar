@@ -18,7 +18,7 @@ func Replace(yaml string, tag string) (string, error) {
 
 	for i, txt := range tagSplit {
 		if strings.Contains(txt, "tag:") {
-			tagSplit[i+1] = tag
+			tagSplit[i+1] = "\""+tag+"\""
 			break
 		}
 	}
