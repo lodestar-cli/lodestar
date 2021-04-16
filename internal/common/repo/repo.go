@@ -5,122 +5,121 @@ import (
 	"github.com/go-git/go-billy/v5"
 	"github.com/go-git/go-billy/v5/memfs"
 	"github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/plumbing/object"
-	"github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/go-git/go-git/v5/storage/memory"
-	"time"
+	"github.com/lodestar-cli/lodestar/internal/cli/files"
+	"github.com/lodestar-cli/lodestar/internal/common/auth"
 )
 
+type LodestarRepository struct {
+	Url         string
+	Credentials auth.GitCredentials
+	FileSystem  billy.Filesystem
+	Storer      *memory.Storage
+	Repository  *git.Repository
+	Worktree    *git.Worktree
+}
 
-func GetRepository(url string, auth *http.BasicAuth) (*git.Repository, billy.Filesystem, error) {
-	var (
-		storer = memory.NewStorage()
-		fs     = memfs.New()
-	)
+func NewLodestarRepository(url string, credentials auth.GitCredentials) (*LodestarRepository, error) {
+	r := LodestarRepository{
+		Url: url,
+		FileSystem: memfs.New(),
+		Credentials: credentials,
+		Storer: memory.NewStorage(),
+	}
 
-	cloneOptions := new(git.CloneOptions)
-	cloneOptions.URL=url
-	cloneOptions.Auth=auth
-
-	repository, err := git.CloneContext(context.TODO(),storer, fs, cloneOptions)
+	err := r.setRepository()
 	if err != nil {
-		return nil, nil, err
-	}
-
-	return repository, fs, nil
-
-}
-
-func GetFileString(fs billy.Filesystem, path string) (string, error){
-	//Create array the size of the file content
-	stat, err := fs.Stat(path)
-	if err != nil{
-		return "", err
-	}
-	bytes := make([]byte, stat.Size()+1)
-
-	//get file from memory
-	file, err := fs.Open(path)
-	if err != nil{
-		return "", err
-	}
-
-	//get file content as string
-	file.Read(bytes)
-	content := string(bytes)
-
-	return content, nil
-}
-
-func GetFileByte(fs billy.Filesystem, path string) ([]byte, error){
-	//Create array the size of the file content
-	stat, err := fs.Stat(path)
-	if err != nil{
 		return nil, err
 	}
-	bytes := make([]byte, stat.Size())
-
-	//get file from memory
-	file, err := fs.Open(path)
-	if err != nil{
+	r.setWorktree()
+	if err != nil {
 		return nil, err
 	}
-	file.Read(bytes)
 
-	return bytes, nil
+	return &r, nil
 }
 
-func UpdateAndPush(fs billy.Filesystem, repository *git.Repository, configPath string, newConfig string, auth *http.BasicAuth, oldTag string, newTag string) error{
+func (r *LodestarRepository) CommitFiles(commitMessage string, updatedFiles ...files.LodestarFile) error {
 
-	worktree, err := repository.Worktree()
+	for _, file := range updatedFiles {
+
+		switch f := file.(type) {
+		case *files.ManagementFile:
+			_, err := r.Worktree.Remove(f.Path)
+			if err != nil {
+				return err
+			}
+
+			configFile, err := r.FileSystem.Create(f.Path)
+			if err != nil {
+				return err
+			}
+
+			_, err = configFile.Write([]byte(f.StringContent))
+			if err != nil {
+				return err
+			}
+
+			_, err = r.Worktree.Add(f.Path)
+			if err != nil {
+				return err
+			}
+		default:
+			f.Print()
+		}
+	}
+
+	commitOptions, err := r.Credentials.CreateCommitOptions(r.Url)
+	if err != nil {
+		return err
+	}
+	_, err = r.Worktree.Commit(commitMessage, commitOptions)
 	if err != nil {
 		return err
 	}
 
-	_, err = worktree.Remove(configPath)
+	return nil
+}
+
+func (r *LodestarRepository) Push() error{
+	pushOption, err := r.Credentials.CreatePushOptions(r.Url)
 	if err != nil {
 		return err
 	}
 
-	configFile, err := fs.Create(configPath)
-	if err != nil {
-		return err
-	}
-
-	_, err = configFile.Write([]byte(newConfig))
-	if err != nil {
-		return err
-	}
-
-	_, err = worktree.Add(configPath)
-	if err != nil {
-		return err
-	}
-
-	//should be edited when context is added
-	signature := &object.Signature{
-		Name: auth.Username,
-		Email: auth.Username,
-		When: time.Now(),
-	}
-
-	_, err = worktree.Commit("Config file updated with Bazel: "+oldTag+" ---> "+newTag, &git.CommitOptions{
-		Author: signature,
-	})
-	if err != nil {
-		return err
-	}
-
-	pushOption := &git.PushOptions{
-		RemoteName: "origin",
-		Auth: auth,
-	}
-
-	err = repository.Push(pushOption)
+	err = r.Repository.Push(pushOption)
 	if err != nil {
 		return err
 	}
 
 	return nil
 
+}
+
+
+func (r *LodestarRepository) setRepository() error {
+
+	cloneOptions, err := r.Credentials.CreateCloneOptions(r.Url)
+	if err != nil{
+		return err
+	}
+
+	r.Repository, err = git.CloneContext(context.TODO(),r.Storer, r.FileSystem, cloneOptions)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+
+func (r *LodestarRepository) setWorktree() error {
+	var err error
+
+	r.Worktree, err = r.Repository.Worktree()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

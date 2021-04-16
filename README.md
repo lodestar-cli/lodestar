@@ -33,7 +33,7 @@ The main goal of Lodestar is to be useful without hendering the readability of y
 This takes advantage of yaml's ability to use comments and won't impact how you deploy your manifests.
 
 
-### AppConfiguration
+### AppConfigurationFile
 
 In order for Lodestar to manage your application's images, the application first needs to be registered through an appConfiguration yaml.  This App Configuration is made up of two main objects: an appInfo object and an envGraph.  The appInfo object holds the metadata for the app.  This includes the name of the app, the url the app's manifests are located at, the path to the stateGraph yaml, and other common information.  The envGraph holds the information needed for Lodestar to correctly update your app's environments.  This tells Lodestar how many environments are in the app, and where to locate the manifests to update the tags with.
 

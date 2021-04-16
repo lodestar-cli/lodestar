@@ -1,5 +1,4 @@
-package lodestarDir
-
+package home
 import (
 	"io/ioutil"
 	"os/user"
@@ -7,7 +6,7 @@ import (
 	"strings"
 )
 
-func GetConfigPath(command string, commandName string) (string, error)  {
+func GetPath(command string, commandName string) (string, error)  {
 	dir, err := getUserHomeDir()
 	if err != nil {
 		return "", err
@@ -17,8 +16,8 @@ func GetConfigPath(command string, commandName string) (string, error)  {
 	return lodestarDirectory, nil
 }
 
-func GetConfigFileNames(command string) ([]string, error){
-	var fileNames []string
+func GetConfigFilePaths(command string) ([]string, error){
+	var filePaths []string
 
 	dir, err := getUserHomeDir()
 	files, err := ioutil.ReadDir(path.Join(dir, ".lodestar/",command))
@@ -27,15 +26,15 @@ func GetConfigFileNames(command string) ([]string, error){
 	}
 	for _, f := range files {
 		if strings.Contains(f.Name(), ".yaml"){
-			name := strings.ReplaceAll(f.Name(),".yaml","")
-			fileNames = append(fileNames, name)
+			fp := path.Join(dir, f.Name())
+			filePaths = append(filePaths, fp)
 		}
 	}
 
-	return fileNames, nil
+	return filePaths, nil
 }
 
-func GetConfigContent(path string) ([]byte, error){
+func GetContent(path string) ([]byte, error){
 
 	content, err := ioutil.ReadFile(path)
 	if err != nil {

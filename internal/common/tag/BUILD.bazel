@@ -1,8 +1,0 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library")
-
-go_library(
-    name = "tag",
-    srcs = ["tag.go"],
-    importpath = "github.com/lodestar-cli/lodestar/internal/common/tag",
-    visibility = ["//:__subpackages__"],
-)

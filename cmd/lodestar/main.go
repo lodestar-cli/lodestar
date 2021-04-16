@@ -1,14 +1,14 @@
 package main
 
 import (
-	app "github.com/lodestar-cli/lodestar/internal/app"
+	app "github.com/lodestar-cli/lodestar/internal/cli/app"
 	"github.com/urfave/cli/v2"
 	"log"
 	"os"
 )
 
 func main() {
-	var tag string
+	var yamlKeys string
 	var username string
 	var token string
 	var srcEnv string
@@ -29,7 +29,7 @@ func main() {
 				Subcommands: []*cli.Command{
 					{
 						Name:  "push",
-						Usage: "Push a new image tag to an Environment",
+						Usage: "Push a new image tag to an Name",
 						UsageText: "In order to push a tag to an environment, either a name for an App configured in ~/.lodestar\n\t"+
 							       " needs to be provided with --name, or a path to an app needs to be provided with --config-path.\n\t"+
 							       " Lodestar will then be able to find the App and pass the tag to the correct environment.",
@@ -72,7 +72,7 @@ func main() {
 							&cli.StringFlag{
 								Name: "tag",
 								Usage: "the `tag` for the new image",
-								Destination: &tag,
+								Destination: &yamlKeys,
 								EnvVars: []string{"IMAGE_TAG"},
 							},
 							&cli.BoolFlag{
@@ -82,10 +82,20 @@ func main() {
 							},
 						},
 						Action: func(c *cli.Context) error {
-							err := app.Push(username,token,name,appConfigPath,environment,tag, outputState)
+							p, err := app.NewPush(username,token,name, appConfigPath, environment, yamlKeys)
 							if err != nil {
 								return err
 							}
+							err = p.Execute()
+							if err != nil {
+								return err
+							}
+
+							err = p.Output(outputState)
+							if err != nil {
+								return err
+							}
+
 							return nil
 						},
 					},
@@ -141,10 +151,20 @@ func main() {
 							},
 						},
 						Action: func(c *cli.Context) error {
-							err := app.Promote(username,token,name,appConfigPath,srcEnv,destEnv,outputState)
+							p, err := app.NewPromote(username, token, name, appConfigPath, srcEnv, destEnv)
 							if err != nil {
 								return err
 							}
+							err = p.Execute()
+							if err != nil {
+								return err
+							}
+
+							err = p.Output(outputState)
+							if err != nil {
+								return err
+							}
+
 							return nil
 						},
 					},
@@ -154,7 +174,11 @@ func main() {
 						UsageText: "Will provide all the Apps within the current context as well as a description of the app.\n\t"+
 							" App names and descriptions come directly from the appInfo block in their respective App configuration file.",
 						Action: func(c *cli.Context) error {
-							err := app.List()
+							l, err := app.NewList()
+							if err != nil{
+								return err
+							}
+							l.Execute()
 							return err
 						},
 					},
@@ -162,6 +186,22 @@ func main() {
 						Name:  "show",
 						Usage: "Prints the configuration file for the specified App",
 						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name: "username",
+								Hidden: true,
+								Usage: "`username` for the version control account that can access the repository",
+								Required: true,
+								Destination: &username,
+								EnvVars: []string{"GIT_USER"},
+							},
+							&cli.StringFlag{
+								Name: "token",
+								Hidden: true,
+								Usage: "`token` for the version control account that can access the repository",
+								Required: true,
+								Destination: &token,
+								EnvVars: []string{"GIT_TOKEN"},
+							},
 							&cli.StringFlag{
 								Name:        "name",
 								Usage:       "the `name` of the app",
@@ -174,8 +214,12 @@ func main() {
 							},
 						},
 						Action: func(c *cli.Context) error {
-							err := app.Show(name, appConfigPath)
-							return err
+							s,err := app.NewShow(username,token,name,appConfigPath)
+							if err != nil{
+								return err
+							}
+							s.Execute()
+							return nil
 						},
 					},
 				},
