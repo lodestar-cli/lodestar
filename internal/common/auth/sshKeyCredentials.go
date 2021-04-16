@@ -33,7 +33,7 @@ func (s *SSHKeyCredentials) CreateCloneOptions(url string) (*git.CloneOptions, e
 	return cloneOptions, nil
 }
 
-func (s *SSHKeyCredentials) CreateCommitOptions(url string) (*git.CommitOptions, error){
+func (s *SSHKeyCredentials) CreateCommitOptions() (*git.CommitOptions, error){
 	signature := &object.Signature{
 		Name: s.Username,
 		Email: s.Username,
@@ -47,7 +47,7 @@ func (s *SSHKeyCredentials) CreateCommitOptions(url string) (*git.CommitOptions,
 	return &commitOptions, nil
 }
 
-func (s *SSHKeyCredentials) CreatePushOptions(url string) (*git.PushOptions, error){
+func (s *SSHKeyCredentials) CreatePushOptions() (*git.PushOptions, error){
 	var err error
 
 	if s.PublicKeys == nil {

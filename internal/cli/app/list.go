@@ -2,13 +2,13 @@ package app
 
 import (
 	"fmt"
-	"github.com/lodestar-cli/lodestar/internal/cli/files"
+	"github.com/lodestar-cli/lodestar/internal/cli/file"
 	"github.com/lodestar-cli/lodestar/internal/cli/home"
 )
 
 type List struct{
 	AppFilePaths          []string
-	AppConfigurationFiles []*files.AppConfigurationFile
+	AppConfigurationFiles []*file.AppConfigurationFile
 }
 
 func NewList() (*List, error){
@@ -19,7 +19,7 @@ func NewList() (*List, error){
 		return nil, err
 	}
 	for _, p := range l.AppFilePaths{
-		f, err := files.NewAppConfigurationFile(p)
+		f, err := file.NewAppConfigurationFile(p)
 		if err != nil{
 			return nil, err
 		}

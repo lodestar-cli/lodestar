@@ -3,11 +3,11 @@ package app
 import (
 	"errors"
 	"fmt"
-	"github.com/lodestar-cli/lodestar/internal/cli/files"
+	"github.com/lodestar-cli/lodestar/internal/cli/file"
 	"github.com/lodestar-cli/lodestar/internal/cli/home"
 	"github.com/lodestar-cli/lodestar/internal/common/auth"
 	"github.com/lodestar-cli/lodestar/internal/common/environment"
-	"github.com/lodestar-cli/lodestar/internal/common/repo"
+	"github.com/lodestar-cli/lodestar/internal/common/remote"
 	"strings"
 	"sync"
 )
@@ -26,9 +26,9 @@ type Push struct {
 	KeysMap              map[string]string
 	GitAuth              auth.GitCredentials
 	Environment          *environment.Environment
-	Repository           *repo.LodestarRepository
-	AppConfigurationFile *files.AppConfigurationFile
-	AppStateFile         *files.AppStateFile
+	Repository           *remote.LodestarRepository
+	AppConfigurationFile *file.AppConfigurationFile
+	AppStateFile         *remote.AppStateFile
 }
 
 func NewPush(username string, token string, app string, configPath string, environment string, yamlKeys string) (*Push, error){
@@ -78,10 +78,10 @@ func NewPush(username string, token string, app string, configPath string, envir
 
 	//3. Clone Manifest Repository
 	fmt.Printf("Cloning %s as %s...\n", p.AppConfigurationFile.Info.RepoUrl, p.CliOptions.Username)
-	p.Repository, err = repo.NewLodestarRepository(p.AppConfigurationFile.Info.RepoUrl, p.GitAuth)
+	p.Repository, err = remote.NewLodestarRepository(p.AppConfigurationFile.Info.RepoUrl, p.GitAuth)
 
 	//4. Fetch App State File from Repository
-	p.AppStateFile, err = files.NewAppStateFile(p.Repository,p.AppConfigurationFile.Info.StatePath, p.AppConfigurationFile.Info.Name)
+	p.AppStateFile, err = remote.NewAppStateFile(p.Repository,p.AppConfigurationFile.Info.StatePath, p.AppConfigurationFile.Info.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -99,8 +99,8 @@ func (p *Push) Execute() error {
 	defer close(finish)
 
 	//1. Update StateGraph and ManagementFiles
-	fileChannel := make(chan files.LodestarFile, 2)
-	var updatedFiles []files.LodestarFile
+	fileChannel := make(chan remote.LodestarFile, 2)
+	var updatedFiles []remote.LodestarFile
 	wg.Add(2)
 
 	go p.updateAppStateFile(fatalErrors, fileChannel, &wg)
@@ -171,7 +171,7 @@ func (p *Push) setAppConfigurationFile() error {
 		return errors.New("must provide an App name or a path to a configuration file. For more information, run: lodestar app push --help")
 	}else if p.CliOptions.ConfigPath != "" {
 		var err error
-		p.AppConfigurationFile, err = files.NewAppConfigurationFile(p.CliOptions.ConfigPath)
+		p.AppConfigurationFile, err = file.NewAppConfigurationFile(p.CliOptions.ConfigPath)
 		if err != nil {
 			return err
 		}
@@ -180,7 +180,7 @@ func (p *Push) setAppConfigurationFile() error {
 		if err != nil {
 			return err
 		}
-		p.AppConfigurationFile, err = files.NewAppConfigurationFile(path)
+		p.AppConfigurationFile, err = file.NewAppConfigurationFile(path)
 	}
 	return nil
 }
@@ -256,9 +256,9 @@ func (p *Push) setAuth(fatalErrors chan error, wg *sync.WaitGroup) {
 	//need to add option that creates ssh credentials
 }
 
-func (p *Push) updateAppStateFile(fatalErrors chan error, fileChannel chan files.LodestarFile, wg *sync.WaitGroup) {
+func (p *Push) updateAppStateFile(fatalErrors chan error, fileChannel chan remote.LodestarFile, wg *sync.WaitGroup) {
 	defer wg.Done()
-	var l files.LodestarFile
+	var l remote.LodestarFile
 	updated, err := p.AppStateFile.UpdateEnvironmentGraph(p.Environment.Name,p.KeysMap)
 	if err != nil{
 		fatalErrors <- err
@@ -273,13 +273,17 @@ func (p *Push) updateAppStateFile(fatalErrors chan error, fileChannel chan files
 	}
 }
 
-func (p *Push) updateManagementFile(fatalErrors chan error, fileChannel chan files.LodestarFile, wg *sync.WaitGroup) {
+func (p *Push) updateManagementFile(fatalErrors chan error, fileChannel chan remote.LodestarFile, wg *sync.WaitGroup) {
 	defer wg.Done()
-	var l files.LodestarFile
+	var l remote.LodestarFile
 
 	fmt.Printf("Retrieving environment configuration at %s...\n", p.Environment.SrcPath)
 
-	m, err := files.NewManagementFile(p.Environment, p.Repository)
+	m, err := remote.NewManagementFile(p.Environment, p.Repository)
+	if err != nil{
+		fatalErrors <- err
+		return
+	}
 
 	updated, err := m.UpdateFileContents(p.KeysMap)
 	if err != nil{

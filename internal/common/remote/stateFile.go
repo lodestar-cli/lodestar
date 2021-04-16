@@ -1,10 +1,9 @@
-package files
+package remote
 
 import (
 	"fmt"
 	"github.com/goccy/go-yaml"
 	"github.com/lodestar-cli/lodestar/internal/common/environment"
-	"github.com/lodestar-cli/lodestar/internal/common/repo"
 	"io/ioutil"
 	"time"
 )
@@ -24,7 +23,7 @@ type AppStateFile struct {
 	StringContent    string
 }
 
-func NewAppStateFile(repository *repo.LodestarRepository, path string, name string) (*AppStateFile, error){
+func NewAppStateFile(repository *LodestarRepository, path string, name string) (*AppStateFile, error){
 	stat, err := repository.FileSystem.Stat(path)
 	if err != nil{
 		return nil, err
@@ -38,7 +37,10 @@ func NewAppStateFile(repository *repo.LodestarRepository, path string, name stri
 	}
 
 	//get file content as string
-	file.Read(bytes)
+	_, err = file.Read(bytes)
+	if err != nil{
+		return nil, err
+	}
 
 	a := AppStateFile{
 		Name: name+"-state",
@@ -95,7 +97,7 @@ func (a *AppStateFile) UpdateEnvironmentGraph(env string, keys map[string]string
 	return false, fmt.Errorf("%s does not exist in this app", env)
 }
 
-func (a * AppStateFile)UpdateFile() error {
+func (a *AppStateFile)UpdateFile() error {
 	a.Updated = time.Now().String()
 
 	s := AppStateGraph{

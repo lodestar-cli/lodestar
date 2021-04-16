@@ -1,10 +1,9 @@
-package files
+package remote
 
 import (
 	"errors"
 	"fmt"
 	"github.com/lodestar-cli/lodestar/internal/common/environment"
-	"github.com/lodestar-cli/lodestar/internal/common/repo"
 	"io/ioutil"
 	"strings"
 )
@@ -16,7 +15,7 @@ type ManagementFile struct{
 	StringContent string
 }
 
-func NewManagementFile(env *environment.Environment, repository *repo.LodestarRepository) (*ManagementFile, error){
+func NewManagementFile(env *environment.Environment, repository *LodestarRepository) (*ManagementFile, error){
 	//Create array the size of the file content
 	stat, err := repository.FileSystem.Stat(env.SrcPath)
 	if err != nil{
@@ -31,7 +30,10 @@ func NewManagementFile(env *environment.Environment, repository *repo.LodestarRe
 	}
 
 	//get file content as string
-	file.Read(bytes)
+	_, err = file.Read(bytes)
+	if err != nil{
+		return nil, err
+	}
 
 	c := ManagementFile{
 		Name: env.Name+"-config",

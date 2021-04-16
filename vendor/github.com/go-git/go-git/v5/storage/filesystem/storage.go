@@ -8,7 +8,7 @@ import (
 	"github.com/go-git/go-billy/v5"
 )
 
-// Storage is an implementation of git.Storer that stores data on disk in the
+// Storage is an implementation of git.Storage that stores data on disk in the
 // standard git format (this is, the .git directory). Zero values of this type
 // are not safe to use, see the NewStorage function below.
 type Storage struct {

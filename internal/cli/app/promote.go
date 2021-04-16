@@ -3,11 +3,11 @@ package app
 import (
 	"errors"
 	"fmt"
-	"github.com/lodestar-cli/lodestar/internal/cli/files"
+	"github.com/lodestar-cli/lodestar/internal/cli/file"
 	"github.com/lodestar-cli/lodestar/internal/cli/home"
 	"github.com/lodestar-cli/lodestar/internal/common/auth"
 	"github.com/lodestar-cli/lodestar/internal/common/environment"
-	"github.com/lodestar-cli/lodestar/internal/common/repo"
+	"github.com/lodestar-cli/lodestar/internal/common/remote"
 	"sync"
 )
 
@@ -25,9 +25,9 @@ type Promote struct{
 	GitAuth              auth.GitCredentials
 	SrcEnvironment       *environment.Environment
 	DestEnvironment      *environment.Environment
-	Repository           *repo.LodestarRepository
-	AppConfigurationFile *files.AppConfigurationFile
-	AppStateFile         *files.AppStateFile
+	Repository           *remote.LodestarRepository
+	AppConfigurationFile *file.AppConfigurationFile
+	AppStateFile         *remote.AppStateFile
 }
 
 func NewPromote(username string, token string, app string, configPath string, srcEnv string, destEnv string) (*Promote,error){
@@ -76,10 +76,10 @@ func NewPromote(username string, token string, app string, configPath string, sr
 
 	//3. Clone Manifest Repository
 	fmt.Printf("Cloning %s as %s...\n", p.AppConfigurationFile.Info.RepoUrl, p.CliOptions.Username)
-	p.Repository, err = repo.NewLodestarRepository(p.AppConfigurationFile.Info.RepoUrl, p.GitAuth)
+	p.Repository, err = remote.NewLodestarRepository(p.AppConfigurationFile.Info.RepoUrl, p.GitAuth)
 
 	//4. Fetch App State File from Repository
-	p.AppStateFile, err = files.NewAppStateFile(p.Repository,p.AppConfigurationFile.Info.StatePath, p.AppConfigurationFile.Info.Name)
+	p.AppStateFile, err = remote.NewAppStateFile(p.Repository,p.AppConfigurationFile.Info.StatePath, p.AppConfigurationFile.Info.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +98,7 @@ func (p *Promote) Execute() error {
 
 	fmt.Printf("Retrieving key values from configuration file %s...\n",p.SrcEnvironment.Name)
 
-	smf, err := files.NewManagementFile(p.SrcEnvironment,p.Repository)
+	smf, err := remote.NewManagementFile(p.SrcEnvironment,p.Repository)
 	if err != nil{
 		return err
 	}
@@ -109,8 +109,8 @@ func (p *Promote) Execute() error {
 	}
 
 	//1. Update StateGraph and ManagementFiles
-	fileChannel := make(chan files.LodestarFile, 2)
-	var updatedFiles []files.LodestarFile
+	fileChannel := make(chan remote.LodestarFile, 2)
+	var updatedFiles []remote.LodestarFile
 	wg.Add(2)
 
 	fmt.Printf("Updating %s environment to %s environment's keys", p.DestEnvironment.Name, p.SrcEnvironment.Name)
@@ -177,9 +177,9 @@ func (p *Promote) Output(b bool) error{
 	return nil
 }
 
-func (p *Promote) updateAppStateFile(fatalErrors chan error, fileChannel chan files.LodestarFile, keysMap map[string]string, wg *sync.WaitGroup) {
+func (p *Promote) updateAppStateFile(fatalErrors chan error, fileChannel chan remote.LodestarFile, keysMap map[string]string, wg *sync.WaitGroup) {
 	defer wg.Done()
-	var l files.LodestarFile
+	var l remote.LodestarFile
 	updated, err := p.AppStateFile.UpdateEnvironmentGraph(p.DestEnvironment.Name, keysMap)
 	if err != nil{
 		fatalErrors <- err
@@ -194,9 +194,9 @@ func (p *Promote) updateAppStateFile(fatalErrors chan error, fileChannel chan fi
 	}
 }
 
-func (p *Promote) updateManagementFile(fatalErrors chan error, fileChannel chan files.LodestarFile, smf *files.ManagementFile, keysMap map[string]string, wg *sync.WaitGroup) {
+func (p *Promote) updateManagementFile(fatalErrors chan error, fileChannel chan remote.LodestarFile, smf *remote.ManagementFile, keysMap map[string]string, wg *sync.WaitGroup) {
 	defer wg.Done()
-	var l files.LodestarFile
+	var l remote.LodestarFile
 
 	updated, err := smf.UpdateFileContents(keysMap)
 	if err != nil{
@@ -214,7 +214,7 @@ func (p *Promote) setAppConfigurationFile() error {
 		return errors.New("must provide an App name or a path to a configuration file. For more information, run: lodestar app push --help")
 	}else if p.CliOptions.ConfigPath != "" {
 		var err error
-		p.AppConfigurationFile, err = files.NewAppConfigurationFile(p.CliOptions.ConfigPath)
+		p.AppConfigurationFile, err = file.NewAppConfigurationFile(p.CliOptions.ConfigPath)
 		if err != nil {
 			return err
 		}
@@ -223,7 +223,7 @@ func (p *Promote) setAppConfigurationFile() error {
 		if err != nil {
 			return err
 		}
-		p.AppConfigurationFile, err = files.NewAppConfigurationFile(path)
+		p.AppConfigurationFile, err = file.NewAppConfigurationFile(path)
 	}
 	return nil
 }

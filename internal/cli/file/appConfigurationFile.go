@@ -1,4 +1,4 @@
-package files
+package file
 
 import (
 	"fmt"
@@ -18,9 +18,9 @@ type Info struct {
 }
 
 type AppConfiguration struct {
-	Info     Info `yaml:"info"`
+	Info     Info                      `yaml:"info"`
 	EnvGraph []environment.Environment `yaml:"envGraph,flow"`
-	YamlKeys []string `yaml:"yamlKeys,flow"`
+	YamlKeys []string                  `yaml:"yamlKeys,flow"`
 }
 
 //LodestarFile
@@ -29,7 +29,7 @@ type AppConfigurationFile struct{
 	Name             string
 	Info             Info
 	EnvironmentGraph []environment.Environment
-	YamlKeys []string
+	YamlKeys         []string
 	ByteContent      []byte
 	StringContent    string
 }

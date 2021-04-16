@@ -1,7 +1,7 @@
 package main
 
 import (
-	app "github.com/lodestar-cli/lodestar/internal/cli/app"
+	"github.com/lodestar-cli/lodestar/internal/cli/app"
 	"github.com/urfave/cli/v2"
 	"log"
 	"os"
@@ -18,7 +18,7 @@ func main() {
 	var environment string
 	var outputState bool
 
-	app := &cli.App{
+	a := &cli.App{
 		Name: "lodestar",
 		Version: "0.1.1",
 		Usage: "Help guide your applications through their environments",
@@ -31,7 +31,7 @@ func main() {
 						Name:  "push",
 						Usage: "Push a new image tag to an Name",
 						UsageText: "In order to push a tag to an environment, either a name for an App configured in ~/.lodestar\n\t"+
-							       " needs to be provided with --name, or a path to an app needs to be provided with --config-path.\n\t"+
+							       " needs to be provided with --name, or a path to an a needs to be provided with --config-path.\n\t"+
 							       " Lodestar will then be able to find the App and pass the tag to the correct environment.",
 						Flags: []cli.Flag {
 							&cli.StringFlag{
@@ -54,12 +54,12 @@ func main() {
 							},
 							&cli.StringFlag{
 								Name: "name",
-								Usage: "the `name` of an app",
+								Usage: "the `name` of an a",
 								Destination: &name,
 							},
 							&cli.StringFlag{
 								Name: "config-path",
-								Usage: "the `path` to the app configuration file",
+								Usage: "the `path` to the a configuration file",
 								Destination: &appConfigPath,
 							},
 							&cli.StringFlag{
@@ -77,7 +77,7 @@ func main() {
 							},
 							&cli.BoolFlag{
 								Name: "output-state",
-								Usage: "will create a local yaml file of the updated app state when set",
+								Usage: "will create a local yaml file of the updated a state when set",
 								Destination: &outputState,
 							},
 						},
@@ -103,7 +103,7 @@ func main() {
 						Name:  "promote",
 						Usage: "Promote an image tag to the next environment",
 						UsageText: "In order to promote an environment's tag, either a name for an App configured in ~/.lodestar\n\t"+
-							" needs to be provided with --name, or a path to an app needs to be provided with --config-path.\n\t"+
+							" needs to be provided with --name, or a path to an a needs to be provided with --config-path.\n\t"+
 							" Lodestar will then be able to find the App and pass the tag to the correct environment.",
 						Flags: []cli.Flag {
 							&cli.StringFlag{
@@ -124,12 +124,12 @@ func main() {
 							},
 							&cli.StringFlag{
 								Name: "name",
-								Usage: "the `name` of an app",
+								Usage: "the `name` of an a",
 								Destination: &name,
 							},
 							&cli.StringFlag{
 								Name: "config-path",
-								Usage: "the `path` to the app configuration file",
+								Usage: "the `path` to the a configuration file",
 								Destination: &appConfigPath,
 							},
 							&cli.StringFlag{
@@ -146,7 +146,7 @@ func main() {
 							},
 							&cli.BoolFlag{
 								Name: "output-state",
-								Usage: "will create a local yaml file of the updated app state when set",
+								Usage: "will create a local yaml file of the updated a state when set",
 								Destination: &outputState,
 							},
 						},
@@ -171,7 +171,7 @@ func main() {
 					{
 						Name:  "list",
 						Usage: "List current context Apps",
-						UsageText: "Will provide all the Apps within the current context as well as a description of the app.\n\t"+
+						UsageText: "Will provide all the Apps within the current context as well as a description of the a.\n\t"+
 							" App names and descriptions come directly from the appInfo block in their respective App configuration file.",
 						Action: func(c *cli.Context) error {
 							l, err := app.NewList()
@@ -204,12 +204,12 @@ func main() {
 							},
 							&cli.StringFlag{
 								Name:        "name",
-								Usage:       "the `name` of the app",
+								Usage:       "the `name` of the a",
 								Destination: &name,
 							},
 							&cli.StringFlag{
 								Name: "config-path",
-								Usage: "the `path` to the app configuration file",
+								Usage: "the `path` to the a configuration file",
 								Destination: &appConfigPath,
 							},
 						},
@@ -227,7 +227,7 @@ func main() {
 		},
 	}
 
-	err := app.Run(os.Args)
+	err := a.Run(os.Args)
 	if err != nil {
 		log.Fatal(err)
 	}

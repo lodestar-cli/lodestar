@@ -1,4 +1,4 @@
-package repo
+package remote
 
 import (
 	"context"
@@ -6,7 +6,6 @@ import (
 	"github.com/go-git/go-billy/v5/memfs"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/storage/memory"
-	"github.com/lodestar-cli/lodestar/internal/cli/files"
 	"github.com/lodestar-cli/lodestar/internal/common/auth"
 )
 
@@ -14,24 +13,24 @@ type LodestarRepository struct {
 	Url         string
 	Credentials auth.GitCredentials
 	FileSystem  billy.Filesystem
-	Storer      *memory.Storage
+	Storage     *memory.Storage
 	Repository  *git.Repository
 	Worktree    *git.Worktree
 }
 
 func NewLodestarRepository(url string, credentials auth.GitCredentials) (*LodestarRepository, error) {
 	r := LodestarRepository{
-		Url: url,
-		FileSystem: memfs.New(),
+		Url:         url,
+		FileSystem:  memfs.New(),
 		Credentials: credentials,
-		Storer: memory.NewStorage(),
+		Storage:     memory.NewStorage(),
 	}
 
 	err := r.setRepository()
 	if err != nil {
 		return nil, err
 	}
-	r.setWorktree()
+	err = r.setWorktree()
 	if err != nil {
 		return nil, err
 	}
@@ -39,12 +38,12 @@ func NewLodestarRepository(url string, credentials auth.GitCredentials) (*Lodest
 	return &r, nil
 }
 
-func (r *LodestarRepository) CommitFiles(commitMessage string, updatedFiles ...files.LodestarFile) error {
+func (r *LodestarRepository) CommitFiles(commitMessage string, updatedFiles ...LodestarFile) error {
 
 	for _, file := range updatedFiles {
 
 		switch f := file.(type) {
-		case *files.ManagementFile:
+		case *ManagementFile:
 			_, err := r.Worktree.Remove(f.Path)
 			if err != nil {
 				return err
@@ -69,7 +68,7 @@ func (r *LodestarRepository) CommitFiles(commitMessage string, updatedFiles ...f
 		}
 	}
 
-	commitOptions, err := r.Credentials.CreateCommitOptions(r.Url)
+	commitOptions, err := r.Credentials.CreateCommitOptions()
 	if err != nil {
 		return err
 	}
@@ -82,7 +81,7 @@ func (r *LodestarRepository) CommitFiles(commitMessage string, updatedFiles ...f
 }
 
 func (r *LodestarRepository) Push() error{
-	pushOption, err := r.Credentials.CreatePushOptions(r.Url)
+	pushOption, err := r.Credentials.CreatePushOptions()
 	if err != nil {
 		return err
 	}
@@ -104,7 +103,7 @@ func (r *LodestarRepository) setRepository() error {
 		return err
 	}
 
-	r.Repository, err = git.CloneContext(context.TODO(),r.Storer, r.FileSystem, cloneOptions)
+	r.Repository, err = git.CloneContext(context.TODO(),r.Storage, r.FileSystem, cloneOptions)
 	if err != nil {
 		return err
 	}

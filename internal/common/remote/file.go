@@ -1,4 +1,4 @@
-package files
+package remote
 
 type LodestarFile interface {
 	Print()

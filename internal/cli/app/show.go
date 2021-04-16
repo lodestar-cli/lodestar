@@ -3,10 +3,10 @@ package app
 import (
 	"errors"
 	"fmt"
-	"github.com/lodestar-cli/lodestar/internal/cli/files"
+	"github.com/lodestar-cli/lodestar/internal/cli/file"
 	"github.com/lodestar-cli/lodestar/internal/cli/home"
 	"github.com/lodestar-cli/lodestar/internal/common/auth"
-	"github.com/lodestar-cli/lodestar/internal/common/repo"
+	"github.com/lodestar-cli/lodestar/internal/common/remote"
 )
 
 type ShowCliOptions struct{
@@ -19,9 +19,9 @@ type ShowCliOptions struct{
 type Show struct{
 	CliOptions           ShowCliOptions
 	GitAuth              auth.GitCredentials
-	Repository           *repo.LodestarRepository
-	AppConfigurationFile *files.AppConfigurationFile
-	AppStateFile         *files.AppStateFile
+	Repository           *remote.LodestarRepository
+	AppConfigurationFile *file.AppConfigurationFile
+	AppStateFile         *remote.AppStateFile
 }
 
 func NewShow(username string, token string, app string, configPath string) (*Show, error){
@@ -44,14 +44,17 @@ func NewShow(username string, token string, app string, configPath string) (*Sho
 		return nil, err
 	}
 
-	s.setAuth()
+	err = s.setAuth()
+	if err != nil{
+		return nil, err
+	}
 
 	//3. Clone Manifest Repository
 	fmt.Printf("Cloning %s as %s...\n", s.AppConfigurationFile.Info.RepoUrl, s.CliOptions.Username)
-	s.Repository, err = repo.NewLodestarRepository(s.AppConfigurationFile.Info.RepoUrl, s.GitAuth)
+	s.Repository, err = remote.NewLodestarRepository(s.AppConfigurationFile.Info.RepoUrl, s.GitAuth)
 
 	//4. Fetch App State File from Repository
-	s.AppStateFile, err = files.NewAppStateFile(s.Repository,s.AppConfigurationFile.Info.StatePath, s.AppConfigurationFile.Info.Name)
+	s.AppStateFile, err = remote.NewAppStateFile(s.Repository,s.AppConfigurationFile.Info.StatePath, s.AppConfigurationFile.Info.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -73,7 +76,7 @@ func (s *Show) setAppConfigurationFile() error {
 		return errors.New("must provide an App name or a path to a configuration file. For more information, run: lodestar app push --help")
 	}else if s.CliOptions.ConfigPath != "" {
 		var err error
-		s.AppConfigurationFile, err = files.NewAppConfigurationFile(s.CliOptions.ConfigPath)
+		s.AppConfigurationFile, err = file.NewAppConfigurationFile(s.CliOptions.ConfigPath)
 		if err != nil {
 			return err
 		}
@@ -82,7 +85,7 @@ func (s *Show) setAppConfigurationFile() error {
 		if err != nil {
 			return err
 		}
-		s.AppConfigurationFile, err = files.NewAppConfigurationFile(path)
+		s.AppConfigurationFile, err = file.NewAppConfigurationFile(path)
 	}
 	return nil
 }

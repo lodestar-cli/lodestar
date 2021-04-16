@@ -28,7 +28,7 @@ func (t *TokenCredentials) CreateCloneOptions(url string) (*git.CloneOptions, er
 	return cloneOptions, nil
 }
 
-func (t *TokenCredentials) CreateCommitOptions(url string) (*git.CommitOptions, error){
+func (t *TokenCredentials) CreateCommitOptions() (*git.CommitOptions, error){
 	signature := &object.Signature{
 		Name: t.Username,
 		Email: t.Username,
@@ -42,7 +42,7 @@ func (t *TokenCredentials) CreateCommitOptions(url string) (*git.CommitOptions, 
 	return &commitOptions, nil
 }
 
-func (t *TokenCredentials) CreatePushOptions(url string) (*git.PushOptions, error){
+func (t *TokenCredentials) CreatePushOptions() (*git.PushOptions, error){
 
 	auth := &http.BasicAuth{
 		Username: t.Username,
