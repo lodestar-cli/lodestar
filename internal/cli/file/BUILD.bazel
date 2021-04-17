@@ -1,0 +1,13 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "file",
+    srcs = ["appConfigurationFile.go"],
+    importpath = "github.com/lodestar-cli/lodestar/internal/cli/file",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//internal/cli/home",
+        "//internal/common/environment",
+        "//vendor/github.com/goccy/go-yaml",
+    ],
+)

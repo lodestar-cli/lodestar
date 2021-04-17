@@ -1,4 +1,4 @@
-load(":app.bzl", "app_push", "app_promote")
+load(":app.bzl", "app_promote", "app_push")
 
 app_push(
     name = "push_example",
@@ -10,8 +10,8 @@ app_push(
 
 app_promote(
     name = "promote_example",
-    lodestar = "//cmd/lodestar",
     app_config = "lodestar-folder-app-example.yaml",
-    src_env = "dev",
     dest_env = "qa",
+    lodestar = "//cmd/lodestar",
+    src_env = "dev",
 )

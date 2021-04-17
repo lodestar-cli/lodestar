@@ -13,9 +13,9 @@ import (
 // DefaultLoader is a filesystem loader ignoring host and resolving paths to /.
 var DefaultLoader = NewFilesystemLoader(osfs.New(""))
 
-// Loader loads repository's storer.Storer based on an optional host and a path.
+// Loader loads repository's storer.Storage based on an optional host and a path.
 type Loader interface {
-	// Load loads a storer.Storer given a transport.Endpoint.
+	// Load loads a storer.Storage given a transport.Endpoint.
 	// Returns transport.ErrRepositoryNotFound if the repository does not
 	// exist.
 	Load(ep *transport.Endpoint) (storer.Storer, error)
@@ -47,11 +47,11 @@ func (l *fsLoader) Load(ep *transport.Endpoint) (storer.Storer, error) {
 	return filesystem.NewStorage(fs, cache.NewObjectLRUDefault()), nil
 }
 
-// MapLoader is a Loader that uses a lookup map of storer.Storer by
+// MapLoader is a Loader that uses a lookup map of storer.Storage by
 // transport.Endpoint.
 type MapLoader map[string]storer.Storer
 
-// Load returns a storer.Storer for given a transport.Endpoint by looking it up
+// Load returns a storer.Storage for given a transport.Endpoint by looking it up
 // in the map. Returns transport.ErrRepositoryNotFound if the endpoint does not
 // exist.
 func (l MapLoader) Load(ep *transport.Endpoint) (storer.Storer, error) {

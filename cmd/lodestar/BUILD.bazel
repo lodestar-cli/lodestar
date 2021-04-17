@@ -6,7 +6,7 @@ go_library(
     importpath = "github.com/lodestar-cli/lodestar/cmd/lodestar",
     visibility = ["//visibility:private"],
     deps = [
-        "//internal/app",
+        "//internal/cli/app",
         "//vendor/github.com/urfave/cli/v2:cli",
     ],
 )

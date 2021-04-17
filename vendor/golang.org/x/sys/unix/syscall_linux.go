@@ -629,7 +629,7 @@ func (sa *SockaddrCAN) sockaddr() (unsafe.Pointer, _Socklen, error) {
 //          hash.Read(b)
 //          fmt.Println(hex.EncodeToString(b))
 //      }
-//      // Output:
+//      // output:
 //      // 2ae01472317d1935a84797ec1983ae243fc6aa28
 //      // 2ae01472317d1935a84797ec1983ae243fc6aa28
 //
@@ -651,7 +651,7 @@ func (sa *SockaddrCAN) sockaddr() (unsafe.Pointer, _Socklen, error) {
 //      }
 //      hash.Read(b)
 //      fmt.Println(hex.EncodeToString(b))
-//      // Output: 85cdcad0c06eef66f805ecce353bec9accbeecc5
+//      // output: 85cdcad0c06eef66f805ecce353bec9accbeecc5
 //
 // For more information, see: http://www.chronox.de/crypto-API/crypto/userspace-if.html.
 type SockaddrALG struct {
