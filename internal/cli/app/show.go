@@ -66,6 +66,7 @@ func (s *Show) Execute() {
 	fmt.Println(" AppConfiguration")
 	fmt.Println("------------------")
 	s.AppConfigurationFile.Print()
+	fmt.Println()
 	fmt.Println(" AppState")
 	fmt.Println("----------")
 	s.AppStateFile.Print()
