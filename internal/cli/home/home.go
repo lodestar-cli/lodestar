@@ -1,4 +1,5 @@
 package home
+
 import (
 	"io/ioutil"
 	"os/user"
@@ -18,9 +19,13 @@ func GetPath(command string, commandName string) (string, error)  {
 
 func GetConfigFilePaths(command string) ([]string, error){
 	var filePaths []string
+	h, err := getUserHomeDir()
+	if err != nil{
+		return nil,err
+	}
+	dir := path.Join(h, ".lodestar/",command)
 
-	dir, err := getUserHomeDir()
-	files, err := ioutil.ReadDir(path.Join(dir, ".lodestar/",command))
+	files, err := ioutil.ReadDir(dir)
 	if err != nil {
 		return nil, err
 	}

@@ -19,8 +19,8 @@ type Info struct {
 
 type AppConfiguration struct {
 	Info     Info                      `yaml:"info"`
-	EnvGraph []environment.Environment `yaml:"envGraph,flow"`
-	YamlKeys []string                  `yaml:"yamlKeys,flow"`
+	EnvGraph []environment.Environment `yaml:"environmentGraph"`
+	YamlKeys []string                  `yaml:"yamlKeys"`
 }
 
 //LodestarFile
@@ -35,7 +35,7 @@ type AppConfigurationFile struct{
 }
 
 func NewAppConfigurationFile(path string) (*AppConfigurationFile, error){
-	a := new(AppConfiguration)
+	a := AppConfiguration{}
 	content, err := home.GetContent(path)
 	if err != nil {
 		return nil, err
@@ -43,6 +43,7 @@ func NewAppConfigurationFile(path string) (*AppConfigurationFile, error){
 
 	err = yaml.Unmarshal(content, &a)
 	if err != nil {
+		fmt.Println(err)
 		return nil, err
 	}
 

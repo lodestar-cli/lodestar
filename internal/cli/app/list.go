@@ -31,8 +31,8 @@ func NewList() (*List, error){
 }
 
 func (l *List) Execute() {
-	fmt.Println(" -Name-\t\t-Description-")
+	fmt.Println(" -App-")
 	for _, app := range l.AppConfigurationFiles {
-		fmt.Printf("* %s\t\t%s\n",app.Name,app.Info.Description)
+		fmt.Printf("* %s\n",app.Name)
 	}
 }

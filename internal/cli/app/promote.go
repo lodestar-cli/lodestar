@@ -98,14 +98,28 @@ func (p *Promote) Execute() error {
 
 	fmt.Printf("Retrieving key values from configuration file %s...\n",p.SrcEnvironment.Name)
 
-	smf, err := remote.NewManagementFile(p.SrcEnvironment,p.Repository)
-	if err != nil{
-		return err
-	}
+	cmfChannel := make(chan *remote.ManagementFile, 2)
+	var dmf *remote.ManagementFile
+	wg.Add(2)
 
-	keysMap, err = smf.GetKeyValues(p.AppConfigurationFile.YamlKeys)
-	if err != nil{
-		return err
+	go p.getCurrentManagementFile(fatalErrors, cmfChannel, p.SrcEnvironment,&wg)
+	go p.getCurrentManagementFile(fatalErrors, cmfChannel, p.DestEnvironment,&wg)
+	go func(){
+		wg.Wait()
+		close(cmfChannel)
+		finish <- true
+	}()
+
+	select {
+	case <-finish:
+		for f := range cmfChannel {
+			switch f.Path{
+			case p.SrcEnvironment.SrcPath:
+				keysMap, err = f.GetKeyValues(p.AppConfigurationFile.YamlKeys)
+			case p.DestEnvironment.SrcPath:
+				dmf = f
+			}
+		}
 	}
 
 	//1. Update StateGraph and ManagementFiles
@@ -113,9 +127,9 @@ func (p *Promote) Execute() error {
 	var updatedFiles []remote.LodestarFile
 	wg.Add(2)
 
-	fmt.Printf("Updating %s environment to %s environment's keys", p.DestEnvironment.Name, p.SrcEnvironment.Name)
+	fmt.Printf("Updating %s environment to %s environment's keys...\n", p.DestEnvironment.Name, p.SrcEnvironment.Name)
 	go p.updateAppStateFile(fatalErrors, fileChannel, keysMap, &wg)
-	go p.updateManagementFile(fatalErrors, fileChannel,smf, keysMap, &wg)
+	go p.updateManagementFile(fatalErrors, fileChannel,dmf, keysMap, &wg)
 
 	go func(){
 		wg.Wait()
@@ -131,9 +145,9 @@ func (p *Promote) Execute() error {
 
 		switch len(updatedFiles) {
 		case 0:
-			fmt.Printf("%s environmnet's state and management files are up to date!", p.DestEnvironment.Name)
+			fmt.Printf("%s environment's state and management files are up to date!\n", p.DestEnvironment.Name)
 		case 1:
-			fmt.Printf("WARNING: %s environmnet's state and management files were out of sync. Syncing files to newest push", p.DestEnvironment.Name)
+			fmt.Printf("WARNING: %s environment's state and management files were out of sync. Syncing files to newest push\n", p.DestEnvironment.Name)
 			err = p.Repository.CommitFiles(fmt.Sprintf("Lodestar updated %v in %s environment", p.AppConfigurationFile.YamlKeys, p.DestEnvironment.Name), updatedFiles...)
 			if err != nil{
 				return err
@@ -175,6 +189,18 @@ func (p *Promote) Output(b bool) error{
 	p.AppStateFile.Print()
 
 	return nil
+}
+
+func (p *Promote) getCurrentManagementFile(fatalErrors chan error, cmfChannel chan *remote.ManagementFile, env *environment.Environment,wg *sync.WaitGroup){
+	defer wg.Done()
+
+	m, err := remote.NewManagementFile(env, p.Repository)
+	if err != nil{
+		fatalErrors <- err
+		return
+	}
+
+	cmfChannel <- m
 }
 
 func (p *Promote) updateAppStateFile(fatalErrors chan error, fileChannel chan remote.LodestarFile, keysMap map[string]string, wg *sync.WaitGroup) {

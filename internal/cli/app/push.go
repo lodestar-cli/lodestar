@@ -50,6 +50,8 @@ func NewPush(username string, token string, app string, configPath string, envir
 
 	p := Push{
 		CliOptions: cli,
+		KeysMap: map[string]string{},
+
 	}
 
 	//1. get app config file
@@ -120,9 +122,9 @@ func (p *Push) Execute() error {
 
 		switch len(updatedFiles) {
 		case 0:
-			fmt.Printf("%s environmnet's state and management files are up to date!", p.Environment.Name)
+			fmt.Printf("%s environment's state and management files are up to date!\n", p.Environment.Name)
 		case 1:
-			fmt.Printf("WARNING: %s environmnet's state and management files were out of sync. Syncing files to newest push", p.Environment.Name)
+			fmt.Printf("WARNING: %s environment's state and management files were out of sync. Syncing files to newest push", p.Environment.Name)
 			err = p.Repository.CommitFiles(fmt.Sprintf("Lodestar updated %v in %s environment", p.AppConfigurationFile.YamlKeys, p.Environment.Name), updatedFiles...)
 			if err != nil{
 				return err

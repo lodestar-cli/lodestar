@@ -29,9 +29,9 @@ func main() {
 				Subcommands: []*cli.Command{
 					{
 						Name:  "push",
-						Usage: "Push a new image tag to an Name",
+						Usage: "Push yaml key values to an environment",
 						UsageText: "In order to push a tag to an environment, either a name for an App configured in ~/.lodestar\n\t"+
-							       " needs to be provided with --name, or a path to an a needs to be provided with --config-path.\n\t"+
+							       " needs to be provided with --name, or a path to an App needs to be provided with --config-path.\n\t"+
 							       " Lodestar will then be able to find the App and pass the tag to the correct environment.",
 						Flags: []cli.Flag {
 							&cli.StringFlag{
@@ -54,30 +54,30 @@ func main() {
 							},
 							&cli.StringFlag{
 								Name: "name",
-								Usage: "the `name` of an a",
+								Usage: "the `name` of an app",
 								Destination: &name,
 							},
 							&cli.StringFlag{
 								Name: "config-path",
-								Usage: "the `path` to the a configuration file",
+								Usage: "the `path` to the app configuration file",
 								Destination: &appConfigPath,
 							},
 							&cli.StringFlag{
 								Name: "environment",
 								Aliases: []string{"env"},
-								Usage: "the `environment` the tag will be pushed to",
+								Usage: "the `environment` the new yaml keys will be pushed to",
 								Required: true,
 								Destination: &environment,
 							},
 							&cli.StringFlag{
-								Name: "tag",
-								Usage: "the `tag` for the new image",
+								Name: "yaml-keys",
+								Usage: "a  comma separated `\"key=value\"` string of yaml keys to update",
 								Destination: &yamlKeys,
-								EnvVars: []string{"IMAGE_TAG"},
+								EnvVars: []string{"YAML_KEYS"},
 							},
 							&cli.BoolFlag{
 								Name: "output-state",
-								Usage: "will create a local yaml file of the updated a state when set",
+								Usage: "will create a local yaml file of the updated app state when set",
 								Destination: &outputState,
 							},
 						},

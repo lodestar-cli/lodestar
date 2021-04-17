@@ -9,7 +9,7 @@ import (
 )
 
 type AppStateGraph struct {
-	Updated string                           `yaml:"updated"`
+	Updated               string             `yaml:"updated"`
 	EnvironmentStateGraph []environment.EnvironmentState `yaml:"environmentStateGraph"`
 }
 
@@ -35,7 +35,6 @@ func NewAppStateFile(repository *LodestarRepository, path string, name string) (
 	if err != nil{
 		return nil, err
 	}
-
 	//get file content as string
 	_, err = file.Read(bytes)
 	if err != nil{
@@ -89,7 +88,6 @@ func (a *AppStateFile) UpdateEnvironmentGraph(env string, keys map[string]string
 			if update{
 				return true, nil
 			} else {
-				fmt.Printf("%s is already up to date!", env)
 				return false, nil
 			}
 		}
@@ -98,7 +96,8 @@ func (a *AppStateFile) UpdateEnvironmentGraph(env string, keys map[string]string
 }
 
 func (a *AppStateFile)UpdateFile() error {
-	a.Updated = time.Now().String()
+
+	a.Updated = time.Now().Format(time.RFC3339)
 
 	s := AppStateGraph{
 		Updated: a.Updated,

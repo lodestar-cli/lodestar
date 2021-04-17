@@ -1,8 +1,8 @@
 package environment
 
 type EnvironmentState struct {
-	Name string `yaml:"name"`
-	YamlKeys  map[string]string `yamlKeys:"tags,omitempty"`
+	Name     string            `yaml:"name"`
+	YamlKeys map[string]string `yaml:"yamlKeys,flow"`
 }
 
 //Updates current State tags to new given tags.  If a new tag isn't in the current State graph, it adds it

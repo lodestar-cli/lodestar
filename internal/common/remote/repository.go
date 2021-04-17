@@ -63,8 +63,26 @@ func (r *LodestarRepository) CommitFiles(commitMessage string, updatedFiles ...L
 			if err != nil {
 				return err
 			}
-		default:
-			f.Print()
+		case *AppStateFile:
+			_, err := r.Worktree.Remove(f.Path)
+			if err != nil {
+				return err
+			}
+
+			configFile, err := r.FileSystem.Create(f.Path)
+			if err != nil {
+				return err
+			}
+
+			_, err = configFile.Write([]byte(f.StringContent))
+			if err != nil {
+				return err
+			}
+
+			_, err = r.Worktree.Add(f.Path)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
