@@ -4,15 +4,15 @@
 
 ## Overview
 
-Based on [Continuous Delivery](https://continuousdelivery.com/),  GitOps culture has allowed for development teams to truly connect their audiences to the code they write every day.  By declaring what their code, tests, and deployments will look like through Git, developers can work quickly with the reassurance that what reaches production will always be in a good state.  Although this sounds nice, code doesn't just magically show up in production.  This is what lead to tools like Kubernetes, CI Servers, and GitOps Controllers (ArgoCD, Flux, etc.) being created.  By using the proper tooling, developers have been able to automate their tests and deployments through different phases (environments) before deploying into production.  A common GitOps pipeline often looks like this:
+GitOps has allowed for development teams to control their DevOps pipelines through the tool they use alsot every day, Git.  By declaring what their code, tests, and deployments will look like through code, developers can work quickly while being reassured what reaches their end users will be in a good state.  Although this sounds nice, code doesn't just magically show up in production.  This is what lead to applications like Kubernetes, CI Tools, and GitOps Controllers (ArgoCD, Flux, etc.) being created.  By using the proper tooling, developers have been able to automate their tests and deployments through different phases (environments) before deploying into production.  A common GitOps pipeline often looks like this:
 
 <div style="text-align:center">
 <img src="https://user-images.githubusercontent.com/51719751/113178192-f6f1ae80-9213-11eb-8e34-7a94e5d87a23.png">
 </div>
 
-As stated above, there are many tools that have been made to run Continuous Integration, Continuous Deployment, and host environments for your code to deploy into.  The one area that isn't covered, and is the key difference between a GitOps and a standard pipeline, is the updating of manifests between CI and CD runs.  There are different strategies for implementing this.  Some teams are able to script together some commands to update manifests, while others choose to keep this as a manual step.  Both these implementations lead to potential human errors and inconsistencies between teams.
+As stated above, there are many tools that have been made to run Continuous Integration, Continuous Deployment, and host environments for your code to deploy into.  The one area that isn't covered, and is the key difference between a GitOps pipeline and a standard pipeline, is the updating of manifests between CI and CD runs. Some teams are able to script together some commands to update manifests, while others choose to keep this as a manual step, but  both of these implementations tend to lead to potential human errors and inconsistencies between teams.
 
-In comes Lodestar.  Lodestar is a tool that guides deployments to their destination in a consistent manner no matter the environment. With Lodestar, pushing a new image tag to an environment or promoting an image to the next environment can be boiled down to a single command.  Lodestar can be as simple or complex as you need it to be, and can grow with your deployment flow.  Not only does Lodestar scale with your pipeline, it is flexible to your deployment strategy, for it can be ran locally or within your automation pipeline.
+Lodestar was created to resolve this issue.  Lodestar is a tool that guides deployments to their destination in a consistent manner no matter the environment. With Lodestar, updating an environment's configuration values or promoting an application to the next environment can be boiled down to a single command.  Not only is Lodestar simple to use, it is also flexible, for it can be ran locally or within your CI/CD pipelines.  No matter where you are in your GitOps journey, Lodestar can help make sure your applications reach their environments safely.
 
 ## Implementation
 
@@ -20,43 +20,11 @@ In comes Lodestar.  Lodestar is a tool that guides deployments to their destinat
 
 **Note: Lodestar currently only supports authentication through personal access tokens over http.  SSH may be added later, but is currently not available.  Please see your Version Control Provider's documentation on creating personal access tokens.**
 
-Because we want Lodestar to be able to take care of updating our manifests in our Git repository, we need to make sure that it has the correct permissions for our repositories.  To do this, you can either pass in a Git account's username and personal access token through the commandline by using the --username and --token flags, or by placing them under the environment variables GIT_USER and GIT_TOKEN.  For CI pipelines, it may make sense to create a CI user and keep its credentials as a secret in your Kubernetes Cluster that can be pulled into an environment variable.  Secure secret implementation can also be done through Sealed Secrets or Sops.
-
-### Tagging
-
-The main goal of Lodestar is to be useful without hendering the readability of your deployments.  Both Helm and Kustomize have a learning curve to understand what is going on in their manifests, and Lodestar doesn't want to make that any harder to read.  The only requirement that Lodestar has is that you need to wrap whatever is holding your tag with ###lodestar###.  An example would look like:
-
-    ###lodestar###
-    tag: v1.2.3
-    ###lodestar###
-
-This takes advantage of yaml's ability to use comments and won't impact how you deploy your manifests.
-
+Because we want Lodestar to be able to take care of updating our manifests in our Git repository, we need to make sure that it has the correct permissions for our repositories.  To do this, you can either pass in a Git account's username and personal access token through the commandline by using the --username and --token flags, or by assigning the environment variables GIT_USER and GIT_TOKEN.  For CI pipelines, it may make sense to create a CI user in your GitHub organization and keep its credentials as a secret in your Kubernetes Cluster that can be pulled into environment variables.  With tools like Sops and Sealed Secrets, this process can be entirely maintained within your Git repository.
 
 ### AppConfigurationFile
 
-In order for Lodestar to manage your application's images, the application first needs to be registered through an appConfiguration yaml.  This App Configuration is made up of two main objects: an appInfo object and an envGraph.  The appInfo object holds the metadata for the app.  This includes the name of the app, the url the app's manifests are located at, the path to the stateGraph yaml, and other common information.  The envGraph holds the information needed for Lodestar to correctly update your app's environments.  This tells Lodestar how many environments are in the app, and where to locate the manifests to update the tags with.
-
-**Sample appConfiguration**
-
-    appInfo:
-      name: lodestar-folder-app-example
-      type: folder
-      description: this is a test app
-      repoUrl: https://github.com/lodestar-cli/lodestar-folder-app-example.git
-      target: main
-      statePath: lodestar-folder-app-example.yaml
-    envGraph:
-      - name: dev
-      srcPath: 1-dev/values.yaml
-      - name: qa
-      srcPath: 2-qa/values.yaml
-      - name: staging
-      srcPath: 3-staging/values.yaml
-      - name: production
-      srcPath: 4-production/values.yaml
-
-**Note: Lodestar currently only allows for configuration files to be on the same branch and in the same repository.  Environments should be declared similarly to how Kustomize or Terraform handles their different environments.  Other deployment strategies like branching environments will be added at a later date**
+In order for Lodestar to manage your applications, the application first needs to be registered through an appConfiguration yaml. This App Configuration is made up of three main objects: info, environmentGraph, and yamlKeys.
 
 appConfiguration files can be created imperatively by running:
 
@@ -64,22 +32,57 @@ appConfiguration files can be created imperatively by running:
 
 which will walk you through creating an appConfiguration.  This will automatically create and load the appConfiguration file into the lodestar home directory at ~/.lodestar/app/***appName***.yaml.  appConfigurations can also be declaratively created and placed undert the app folder in the lodestar home directory or passed through the terminal through the --config-path flag when attempting to push or promote.  It is common to include the appConfig in your code repository and pass it to lodestar when running in your pipelines.
 
+#### Info
+
+The Info object holds the metadata about your application so that Lodestar know's what repository holds the manifests and where the app state file is located at.  This also holds the name and the description of the app so others can easily identify what is being updated.
+
+#### EnvironmentGraph
+
+The EnvironmentGraph is waht helps lodestar located the files it will be updating for each environment.  It is important to keep this part up to date so that Lodestar can find the files correctly and update tehm when your run a push or a promote.
+
+#### YamlKeys
+
+YamlKeys is what identifies the keys for Lodestar to look for in the configuration management file that is being updated.  It is a list of strings that Lodestar will use to search with.  if you wish to replace the key tag with a new value, simply add tag to the yamlKeys list and Lodestar will now to look for it when pushing or updating.  If you wish to update a key, it must be in this list, for Lodestar will fail if it is given a Key that doesn't match the ones within this list.
+
+**Sample appConfiguration**
+
+    info:
+      name: lodestar-folder-app-example
+      type: folder
+      description: this is a test app
+      repoUrl: https://github.com/lodestar-cli/lodestar-folder-app-example.git
+      target: main
+      statePath: lodestar-folder-app-example.yaml
+    environmentGraph:
+    - name: dev
+        srcPath: 1-dev/values.yaml
+    - name: qa
+      srcPath: 2-qa/values.yaml
+    - name: staging
+      srcPath: 3-staging/values.yaml
+    - name: production
+      srcPath: 4-production/values.yaml
+    yamlKeys:
+      - tag
+
+**Note: Lodestar currently only allows for configuration files to be on the same branch and in the same repository.  Environments should be declared similarly to how Kustomize or Terraform handles their different environments.  Other deployment strategies like branching environments will be added at a later date**
+
 ### StateGraph
   
-Although you will not have to create the stateGraph, it is important to know what it does and why it's there.  When you create your appConfig, Lodestar will go through the environments in the envGraph and create an environment in the stateGraph.  Light house will then go to the location in the manifest repository declared in the envGraph environment, grab the tag from the manifest, and place it in the stateGraph under the proper environment.  The stateGraph is always in sync with your environments, and shouldn't be updated by hand.  The main reason behind the stateGraph is so that Lodestar can keep track of what state you want your environments to be in without needing a backend database to run.
+Although you will not have to create the stateGraph, it is important to know what it does and why it's there.  When you create your appConfig, Lodestar will go through the environments in the envGraph and create an environment in the stateGraph.  Lodestar will then go to the location in the manifest repository declared in the envGraph environment, grab the key from the manifest, and place it in the stateGraph under the proper environment.  The stateGraph is always in sync with your environments, and shouldn't be updated by hand.  The main reason behind the stateGraph is so that Lodestar can keep track of what state you want your environments to be in without needing a backend database to run.
 
 **Sample stateGraph**
 
-    state:
-      - environment: dev
-      tag: v1.1.1
-      - environment: qa
-      tag: v1.1.0
-      - environment: staging
-      tag: v1.1.0
-      - environment: production
-      tag: v1.1.0                      
-
+    updated: 2021-04-17T16:09:17-05:00
+    environmentStateGraph:
+    - name: dev
+      yamlKeys: {tag: aaabbb}
+    - name: qa
+      yamlKeys: {tag: 12l8767}
+    - name: staging
+      yamlKeys: {tag: 12345}
+    - name: production
+      yamlKeys: {tag: 12345}
 ## Documentation
 
 **Note: Currently, lodestar only supports pushing and promoting of a single application at a time.  More work may be done to expand the capabilities in the future**
@@ -88,38 +91,56 @@ Although you will not have to create the stateGraph, it is important to know wha
 
 #### Push
 
-Pushing allows for you to define a new tag for an environment.  This is handy for when you just created a new image and want it to go into a development environment for integration testing.  Pushing is typically done after a new image is created and the tag isn't in an environment yet.  Either a name for an app currently loaded in the home directory or a path to a configuration file must be provided.
+NAME:
+   lodestar app push - Push yaml key values to an environment
 
-    lodestar app push [options]
+USAGE:
+   In order to push keys to an environment, either a name for an App configured in ~/.lodestar
+   needs to be provided with --name, or a path to an App needs to be provided with --config-path.
+   Lodestar will then be able to find the App and pass the keys to the correct environment.
 
-    Options:
-    --name name                                   the name of an app
-    --config-path path                            the path to the app configuration file
-    --environment environment, --env environment  the environment the tag will be pushed to
-    --tag tag                                     the tag for the new image
-    --output-state                                will create a local yaml file of the updated app state when set
+OPTIONS:
+   --name name                                   the name of an app
+   --config-path path                            the path to the app configuration file
+   --environment environment, --env environment  the environment the new yaml keys will be pushed to
+   --yaml-keys "key=value"                       a  comma separated "key=value" string of yaml keys to update [$YAML_KEYS]
+   --output-state                                will create a local yaml file of the updated app state when set (default: false)
 
 #### Promote
 
-Promoting an image between environments allows for the promotion of an image without having to know the tag.  This will grab the tag in a source environment and promote it to a destination environment.  Either a name for an app currently loaded in the home directory or a path to a configuration file must be provided.
+NAME:
+   lodestar app promote - Promote an an environment's key values to the next environment
 
-    lodestar app promote [options]
+USAGE:
+   In order to promote an environment's keys, either a name for an App configured in ~/.lodestar
+   needs to be provided with --name, or a path to an App needs to be provided with --config-path.
+   Lodestar will then be able to find the App and pass the keys to the correct environment.
 
-    Options:
-    --name name                                   the name of an app
-    --config-path path                            the path to the app configuration file
-    --environment environment, --env environment  the environment the tag will be pushed to
-    --tag tag                                     the tag for the new image
-    --output-state                                will create a local yaml file of the updated app state when set
+OPTIONS:
+   --name name         the name of an a
+   --config-path path  the path to the a configuration file
+   --src-env name      the name of the source environment
+   --dest-env name     the name of the destination
+   --output-state      will create a local yaml file of the updated a state when set (default: false)
 
 #### List
 
-Will list the name and description of all apps currently in the ~/.lodestar/app directory
+NAME:
+   lodestar app list - List current context Apps
 
-    lodestar app list
+USAGE:
+   Will provide all the Apps within the current context as well as a description of the App.
+   App names and descriptions come directly from the appInfo block in their respective App configuration file.
 
 #### Show
 
-Will show the appConfiguration of an app when provided a name.
+NAME:
+   lodestar app show - Prints information on the provided App
 
-    lodestar app show --name [name]
+USAGE:
+   WHen provided an App name of path to an AppConfiguration file, Show will print out both the AppConfiguration file
+  as well as the current state of the Application's environments.
+
+OPTIONS:
+   --name name         the name of the a
+   --config-path path  the path to the a configuration file

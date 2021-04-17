@@ -1,10 +1,11 @@
 package main
 
 import (
-	"github.com/lodestar-cli/lodestar/internal/cli/app"
-	"github.com/urfave/cli/v2"
 	"log"
 	"os"
+
+	"github.com/lodestar-cli/lodestar/internal/cli/app"
+	"github.com/urfave/cli/v2"
 )
 
 func main() {
@@ -19,70 +20,70 @@ func main() {
 	var outputState bool
 
 	a := &cli.App{
-		Name: "lodestar",
+		Name:    "lodestar",
 		Version: "0.2.0",
-		Usage: "Help guide your applications through their environments",
+		Usage:   "Help guide your applications through their environments",
 		Commands: []*cli.Command{
 			{
-				Name:        "app",
-				Usage:       "Manage application images",
+				Name:  "app",
+				Usage: "Manage application images",
 				Subcommands: []*cli.Command{
 					{
 						Name:  "push",
 						Usage: "Push yaml key values to an environment",
-						UsageText: "In order to push a tag to an environment, either a name for an App configured in ~/.lodestar\n\t"+
-							       " needs to be provided with --name, or a path to an App needs to be provided with --config-path.\n\t"+
-							       " Lodestar will then be able to find the App and pass the tag to the correct environment.",
-						Flags: []cli.Flag {
+						UsageText: "In order to push keys to an environment, either a name for an App configured in ~/.lodestar\n\t" +
+							" needs to be provided with --name, or a path to an App needs to be provided with --config-path.\n\t" +
+							" Lodestar will then be able to find the App and pass the keys to the correct environment.",
+						Flags: []cli.Flag{
 							&cli.StringFlag{
-								Name: "username",
-								Hidden: true,
-								Aliases: []string{"u"},
-								Usage: "`username` for the version control account that can access the repository",
-								Required: true,
+								Name:        "username",
+								Hidden:      true,
+								Aliases:     []string{"u"},
+								Usage:       "`username` for the version control account that can access the repository",
+								Required:    true,
 								Destination: &username,
-								EnvVars: []string{"GIT_USER"},
+								EnvVars:     []string{"GIT_USER"},
 							},
 							&cli.StringFlag{
-								Name: "token",
-								Hidden: true,
-								Aliases: []string{"t"},
-								Usage: "`token` for the version control account that can access the repository",
-								Required: true,
+								Name:        "token",
+								Hidden:      true,
+								Aliases:     []string{"t"},
+								Usage:       "`token` for the version control account that can access the repository",
+								Required:    true,
 								Destination: &token,
-								EnvVars: []string{"GIT_TOKEN"},
+								EnvVars:     []string{"GIT_TOKEN"},
 							},
 							&cli.StringFlag{
-								Name: "name",
-								Usage: "the `name` of an app",
+								Name:        "name",
+								Usage:       "the `name` of an App",
 								Destination: &name,
 							},
 							&cli.StringFlag{
-								Name: "config-path",
-								Usage: "the `path` to the app configuration file",
+								Name:        "config-path",
+								Usage:       "the `path` to the App configuration file",
 								Destination: &appConfigPath,
 							},
 							&cli.StringFlag{
-								Name: "environment",
-								Aliases: []string{"env"},
-								Usage: "the `environment` the new yaml keys will be pushed to",
-								Required: true,
+								Name:        "environment",
+								Aliases:     []string{"env"},
+								Usage:       "the `environment` the new yaml keys will be pushed to",
+								Required:    true,
 								Destination: &environment,
 							},
 							&cli.StringFlag{
-								Name: "yaml-keys",
-								Usage: "a  comma separated `\"key=value\"` string of yaml keys to update",
+								Name:        "yaml-keys",
+								Usage:       "a  comma separated `\"key=value\"` string of yaml keys to update",
 								Destination: &yamlKeys,
-								EnvVars: []string{"YAML_KEYS"},
+								EnvVars:     []string{"YAML_KEYS"},
 							},
 							&cli.BoolFlag{
-								Name: "output-state",
-								Usage: "will create a local yaml file of the updated app state when set",
+								Name:        "output-state",
+								Usage:       "will create a local yaml file of the updated App state when set",
 								Destination: &outputState,
 							},
 						},
 						Action: func(c *cli.Context) error {
-							p, err := app.NewPush(username,token,name, appConfigPath, environment, yamlKeys)
+							p, err := app.NewPush(username, token, name, appConfigPath, environment, yamlKeys)
 							if err != nil {
 								return err
 							}
@@ -101,52 +102,52 @@ func main() {
 					},
 					{
 						Name:  "promote",
-						Usage: "Promote an image tag to the next environment",
-						UsageText: "In order to promote an environment's tag, either a name for an App configured in ~/.lodestar\n\t"+
-							" needs to be provided with --name, or a path to an a needs to be provided with --config-path.\n\t"+
-							" Lodestar will then be able to find the App and pass the tag to the correct environment.",
-						Flags: []cli.Flag {
+						Usage: "Promote an an environment's key values to the next environment",
+						UsageText: "In order to promote an environment's keys, either a name for an App configured in ~/.lodestar\n\t" +
+							" needs to be provided with --name, or a path to an App needs to be provided with --config-path.\n\t" +
+							" Lodestar will then be able to find the App and pass the keys to the correct environment.",
+						Flags: []cli.Flag{
 							&cli.StringFlag{
-								Name: "username",
-								Hidden: true,
-								Usage: "`username` for the version control account that can access the repository",
-								Required: true,
+								Name:        "username",
+								Hidden:      true,
+								Usage:       "`username` for the version control account that can access the repository",
+								Required:    true,
 								Destination: &username,
-								EnvVars: []string{"GIT_USER"},
+								EnvVars:     []string{"GIT_USER"},
 							},
 							&cli.StringFlag{
-								Name: "token",
-								Hidden: true,
-								Usage: "`token` for the version control account that can access the repository",
-								Required: true,
+								Name:        "token",
+								Hidden:      true,
+								Usage:       "`token` for the version control account that can access the repository",
+								Required:    true,
 								Destination: &token,
-								EnvVars: []string{"GIT_TOKEN"},
+								EnvVars:     []string{"GIT_TOKEN"},
 							},
 							&cli.StringFlag{
-								Name: "name",
-								Usage: "the `name` of an a",
+								Name:        "name",
+								Usage:       "the `name` of an a",
 								Destination: &name,
 							},
 							&cli.StringFlag{
-								Name: "config-path",
-								Usage: "the `path` to the a configuration file",
+								Name:        "config-path",
+								Usage:       "the `path` to the App configuration file",
 								Destination: &appConfigPath,
 							},
 							&cli.StringFlag{
-								Name: "src-env",
-								Usage: "the `name` of the source environment",
-								Required: true,
+								Name:        "src-env",
+								Usage:       "the `name` of the source environment",
+								Required:    true,
 								Destination: &srcEnv,
 							},
 							&cli.StringFlag{
-								Name: "dest-env",
-								Usage: "the `name` of the destination",
-								Required: true,
+								Name:        "dest-env",
+								Usage:       "the `name` of the destination",
+								Required:    true,
 								Destination: &destEnv,
 							},
 							&cli.BoolFlag{
-								Name: "output-state",
-								Usage: "will create a local yaml file of the updated a state when set",
+								Name:        "output-state",
+								Usage:       "will create a local yaml file of the updated App state when set",
 								Destination: &outputState,
 							},
 						},
@@ -171,11 +172,11 @@ func main() {
 					{
 						Name:  "list",
 						Usage: "List current context Apps",
-						UsageText: "Will provide all the Apps within the current context as well as a description of the a.\n\t"+
+						UsageText: "Will provide all the Apps within the current context as well as a description of the App.\n\t" +
 							" App names and descriptions come directly from the appInfo block in their respective App configuration file.",
 						Action: func(c *cli.Context) error {
 							l, err := app.NewList()
-							if err != nil{
+							if err != nil {
 								return err
 							}
 							l.Execute()
@@ -184,23 +185,25 @@ func main() {
 					},
 					{
 						Name:  "show",
-						Usage: "Prints the configuration file for the specified App",
+						Usage: "Prints information on the provided App",
+						UsageText: "WHen provided an App name of path to an AppConfiguration file, Show will print out both the AppConfiguration file\n\t" +
+							"as well as the current state of the Application's environments.",
 						Flags: []cli.Flag{
 							&cli.StringFlag{
-								Name: "username",
-								Hidden: true,
-								Usage: "`username` for the version control account that can access the repository",
-								Required: true,
+								Name:        "username",
+								Hidden:      true,
+								Usage:       "`username` for the version control account that can access the repository",
+								Required:    true,
 								Destination: &username,
-								EnvVars: []string{"GIT_USER"},
+								EnvVars:     []string{"GIT_USER"},
 							},
 							&cli.StringFlag{
-								Name: "token",
-								Hidden: true,
-								Usage: "`token` for the version control account that can access the repository",
-								Required: true,
+								Name:        "token",
+								Hidden:      true,
+								Usage:       "`token` for the version control account that can access the repository",
+								Required:    true,
 								Destination: &token,
-								EnvVars: []string{"GIT_TOKEN"},
+								EnvVars:     []string{"GIT_TOKEN"},
 							},
 							&cli.StringFlag{
 								Name:        "name",
@@ -208,14 +211,14 @@ func main() {
 								Destination: &name,
 							},
 							&cli.StringFlag{
-								Name: "config-path",
-								Usage: "the `path` to the a configuration file",
+								Name:        "config-path",
+								Usage:       "the `path` to the a configuration file",
 								Destination: &appConfigPath,
 							},
 						},
 						Action: func(c *cli.Context) error {
-							s,err := app.NewShow(username,token,name,appConfigPath)
-							if err != nil{
+							s, err := app.NewShow(username, token, name, appConfigPath)
+							if err != nil {
 								return err
 							}
 							s.Execute()
