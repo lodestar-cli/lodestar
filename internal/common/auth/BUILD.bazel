@@ -2,8 +2,17 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "auth",
-    srcs = ["auth.go"],
+    srcs = [
+        "gitCredentials.go",
+        "sshKeyCredentials.go",
+        "tokenCredentials.go",
+    ],
     importpath = "github.com/lodestar-cli/lodestar/internal/common/auth",
     visibility = ["//:__subpackages__"],
-    deps = ["//vendor/github.com/go-git/go-git/v5/plumbing/transport/http"],
+    deps = [
+        "//vendor/github.com/go-git/go-git/v5:go-git",
+        "//vendor/github.com/go-git/go-git/v5/plumbing/object",
+        "//vendor/github.com/go-git/go-git/v5/plumbing/transport/http",
+        "//vendor/github.com/go-git/go-git/v5/plumbing/transport/ssh",
+    ],
 )
