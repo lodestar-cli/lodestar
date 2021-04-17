@@ -20,7 +20,7 @@ func main() {
 
 	a := &cli.App{
 		Name: "lodestar",
-		Version: "0.1.1",
+		Version: "0.2.0",
 		Usage: "Help guide your applications through their environments",
 		Commands: []*cli.Command{
 			{
