@@ -1,11 +1,11 @@
-appInfo:
+info:
   name: lodestar-folder-app-example
   type: folder
   description: this is a test app
   repoUrl: https://github.com/lodestar-cli/lodestar-folder-app-example.git
   target: main
   statePath: lodestar-folder-app-example.yaml
-envGraph:
+environmentGraph:
 - name: dev
   srcPath: 1-dev/values.yaml
 - name: qa
@@ -14,3 +14,5 @@ envGraph:
   srcPath: 3-staging/values.yaml
 - name: production
   srcPath: 4-production/values.yaml
+yamlKeys:
+  - tag
