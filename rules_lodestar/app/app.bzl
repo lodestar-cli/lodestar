@@ -5,7 +5,7 @@ def app_push(name, app_config, environment, yaml_keys):
     srcs = [
         app_config
     ],
-    exec_tools = ["//cmd/lodestar:lodestar"],
+    exec_tools = ["@lodestar//cmd/lodestar:lodestar"],
     outs = ["app_push_"+name+".sh"],
-    cmd_bash = "$(location //cmd/lodestar:lodestar) app push --config-path $(locations "+app_config+") --env "+environment+" --yaml-keys "+yaml_keys+" && echo \"echo Lodestar Push Complete!\" > $@",
+    cmd_bash = "$(location @lodestar//cmd/lodestar:lodestar) app push --config-path $(locations "+app_config+") --env "+environment+" --yaml-keys "+yaml_keys+" && echo \"echo Lodestar Push Complete!\" > $@",
 )
