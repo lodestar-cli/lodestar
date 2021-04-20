@@ -5,7 +5,7 @@ app_push(
     app_config = "lodestar-folder-app-example.yaml",
     environment = "dev",
     lodestar = "//cmd/lodestar",
-    tag = "$(tag)",
+    yaml_keys = "$(yaml-keys)",
 )
 
 app_promote(
