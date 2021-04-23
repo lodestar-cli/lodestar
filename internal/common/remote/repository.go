@@ -98,7 +98,7 @@ func (r *LodestarRepository) CommitFiles(commitMessage string, updatedFiles ...L
 	return nil
 }
 
-func (r *LodestarRepository) Push() error{
+func (r *LodestarRepository) Push() error {
 	pushOption, err := r.Credentials.CreatePushOptions()
 	if err != nil {
 		return err
@@ -113,22 +113,20 @@ func (r *LodestarRepository) Push() error{
 
 }
 
-
 func (r *LodestarRepository) setRepository() error {
 
 	cloneOptions, err := r.Credentials.CreateCloneOptions(r.Url)
-	if err != nil{
+	if err != nil {
 		return err
 	}
 
-	r.Repository, err = git.CloneContext(context.TODO(),r.Storage, r.FileSystem, cloneOptions)
+	r.Repository, err = git.CloneContext(context.TODO(), r.Storage, r.FileSystem, cloneOptions)
 	if err != nil {
 		return err
 	}
 
 	return nil
 }
-
 
 func (r *LodestarRepository) setWorktree() error {
 	var err error

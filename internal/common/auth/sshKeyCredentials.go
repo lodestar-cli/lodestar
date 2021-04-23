@@ -9,13 +9,13 @@ import (
 )
 
 type SSHKeyCredentials struct {
-	Username string
-	KeyPath string
+	Username    string
+	KeyPath     string
 	KeyPassword string
-	PublicKeys *ssh.PublicKeys
+	PublicKeys  *ssh.PublicKeys
 }
 
-func (s *SSHKeyCredentials) CreateCloneOptions(url string) (*git.CloneOptions, error){
+func (s *SSHKeyCredentials) CreateCloneOptions(url string) (*git.CloneOptions, error) {
 	var err error
 
 	if s.PublicKeys == nil {
@@ -26,18 +26,18 @@ func (s *SSHKeyCredentials) CreateCloneOptions(url string) (*git.CloneOptions, e
 	}
 
 	cloneOptions := &git.CloneOptions{
-		URL : url,
+		URL:  url,
 		Auth: s.PublicKeys,
 	}
 
 	return cloneOptions, nil
 }
 
-func (s *SSHKeyCredentials) CreateCommitOptions() (*git.CommitOptions, error){
+func (s *SSHKeyCredentials) CreateCommitOptions() (*git.CommitOptions, error) {
 	signature := &object.Signature{
-		Name: s.Username,
+		Name:  s.Username,
 		Email: s.Username,
-		When: time.Now(),
+		When:  time.Now(),
 	}
 
 	commitOptions := git.CommitOptions{
@@ -47,7 +47,7 @@ func (s *SSHKeyCredentials) CreateCommitOptions() (*git.CommitOptions, error){
 	return &commitOptions, nil
 }
 
-func (s *SSHKeyCredentials) CreatePushOptions() (*git.PushOptions, error){
+func (s *SSHKeyCredentials) CreatePushOptions() (*git.PushOptions, error) {
 	var err error
 
 	if s.PublicKeys == nil {
@@ -59,7 +59,7 @@ func (s *SSHKeyCredentials) CreatePushOptions() (*git.PushOptions, error){
 
 	pushOptions := &git.PushOptions{
 		RemoteName: "origin",
-		Auth: s.PublicKeys,
+		Auth:       s.PublicKeys,
 	}
 
 	return pushOptions, nil
