@@ -2,11 +2,13 @@ package remote
 
 import (
 	"context"
+	"errors"
 	"github.com/go-git/go-billy/v5"
 	"github.com/go-git/go-billy/v5/memfs"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/storage/memory"
 	"github.com/lodestar-cli/lodestar/internal/common/auth"
+	"strings"
 )
 
 type LodestarRepository struct {
@@ -19,11 +21,21 @@ type LodestarRepository struct {
 }
 
 func NewLodestarRepository(url string, credentials auth.GitCredentials) (*LodestarRepository, error) {
+	if url == ""{
+		return nil, errors.New("cannot clone repository. Url cannot be blank")
+	} else if !strings.Contains(url, "https://"){
+		if !strings.Contains(url, "http://") {
+			return nil, errors.New("cannot clone repository. Url must be of schema http or https")
+		}
+	}
+
 	r := LodestarRepository{
 		Url:         url,
 		FileSystem:  memfs.New(),
 		Credentials: credentials,
 		Storage:     memory.NewStorage(),
+		Repository: new(git.Repository),
+		Worktree:   new(git.Worktree),
 	}
 
 	err := r.setRepository()
@@ -114,7 +126,6 @@ func (r *LodestarRepository) Push() error {
 }
 
 func (r *LodestarRepository) setRepository() error {
-
 	cloneOptions, err := r.Credentials.CreateCloneOptions(r.Url)
 	if err != nil {
 		return err

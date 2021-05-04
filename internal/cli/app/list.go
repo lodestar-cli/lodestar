@@ -14,7 +14,8 @@ type List struct {
 func NewList() (*List, error) {
 	var err error
 	l := List{}
-	l.AppFilePaths, err = home.GetConfigFilePaths("app")
+	iou := new(home.Reader)
+	l.AppFilePaths, err = home.GetConfigFilePaths("app", iou)
 	if err != nil {
 		return nil, err
 	}

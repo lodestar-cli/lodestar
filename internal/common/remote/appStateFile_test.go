@@ -9,9 +9,9 @@ import (
 )
 
 func TestAppStateFile_GetByteContent(t *testing.T) {
-	a, err := getTestAppStateFile()
-	if err != nil {
-		t.Error("Error creating test AppStateFile")
+	a, err := setTestAppStateFile()
+	if err != nil{
+		t.Errorf("Error settint test app state file: %s", err)
 	}
 	b := a.GetByteContent()
 
@@ -21,11 +21,10 @@ func TestAppStateFile_GetByteContent(t *testing.T) {
 }
 
 func TestAppStateFile_GetStringContent(t *testing.T) {
-	a, err := getTestAppStateFile()
-	if err != nil {
-		t.Error("Error creating test AppStateFile")
+	a, err := setTestAppStateFile()
+	if err != nil{
+		t.Errorf("Error settint test app state file: %s", err)
 	}
-
 	s := a.GetStringContent()
 
 	if a.StringContent != s {
@@ -34,7 +33,10 @@ func TestAppStateFile_GetStringContent(t *testing.T) {
 }
 
 func TestAppStateFile_UpdateEnvironmentStateGraph(t *testing.T) {
-
+	a, err := setTestAppStateFile()
+	if err != nil{
+		t.Errorf("Error settint test app state file: %s", err)
+	}
 	m := map[string]string{
 		"tag":  "newTag",
 		"tag1": "alsoNewTag",
@@ -48,13 +50,13 @@ func TestAppStateFile_UpdateEnvironmentStateGraph(t *testing.T) {
 	}{
 		{"dev", m, true, false},
 		{"badEnv", m, false, true},
-		{"dev", map[string]string{"tag": "123456", "tag1": "adfasdfasdf"}, false, false},
+		{"dev", a.EnvironmentStateGraph[0].YamlKeys, false, false},
 	}
 
 	for _, test := range testTable {
-		a, err := getTestAppStateFile()
-		if err != nil {
-			t.Error("Error creating test AppStateFile")
+		a, err := setTestAppStateFile()
+		if err != nil{
+			t.Errorf("Error settint test app state file: %s", err)
 		}
 		var n int
 
@@ -87,11 +89,11 @@ func TestAppStateFile_UpdateEnvironmentStateGraph(t *testing.T) {
 }
 
 func TestAppStateFile_UpdateFile(t *testing.T) {
-	a, err := getTestAppStateFile()
-	if err != nil {
-		t.Error("Error creating test AppStateFile")
+	a, err := setTestAppStateFile()
+	if err != nil{
+		t.Errorf("Error settint test app state file: %s", err)
 	}
-	// test content
+	// a content
 	b := a.ByteContent
 	s := a.StringContent
 	a.ByteContent = []byte("")
@@ -105,13 +107,16 @@ func TestAppStateFile_UpdateFile(t *testing.T) {
 	if a.StringContent != s {
 		t.Error("Error Updating File: string content does not update")
 	}
-	// test time
+	// a time
 
 	now := time.Now()
 	time.Sleep(time.Second)
 	a.UpdateFile()
 
 	newTime, err := time.Parse(time.RFC3339, a.Updated)
+	if err != nil{
+		t.Errorf("error setting time: %s", err)
+	}
 
 	if !now.Before(newTime) {
 		t.Error("Error Updating File: time is not updated")
@@ -119,25 +124,25 @@ func TestAppStateFile_UpdateFile(t *testing.T) {
 
 }
 
-func getTestAppStateFile() (*AppStateFile, error) {
+func setTestAppStateFile()  (*AppStateFile, error) {
 	testGraph := AppStateGraph{
 		Updated: time.Now().Format(time.RFC3339),
 		EnvironmentStateGraph: []environment.EnvironmentState{
-			environment.EnvironmentState{
+			{
 				Name:     "dev",
-				YamlKeys: map[string]string{"tag": "123456", "tag1": "adfasdfasdf"},
+				YamlKeys: map[string]string{"tag": "123456", "tag1": "4567899"},
 			},
-			environment.EnvironmentState{
+			{
 				Name:     "qa",
-				YamlKeys: map[string]string{"tag": "123456", "tag1": "adfasdfasdf"},
+				YamlKeys: map[string]string{"tag": "123456", "tag1": "4567899"},
 			},
-			environment.EnvironmentState{
+			{
 				Name:     "staging",
-				YamlKeys: map[string]string{"tag": "123456", "tag1": "adfasdfasdf"},
+				YamlKeys: map[string]string{"tag": "123456", "tag1": "4567899"},
 			},
-			environment.EnvironmentState{
+			{
 				Name:     "prod",
-				YamlKeys: map[string]string{"tag": "123456", "tag1": "adfasdfasdf"},
+				YamlKeys: map[string]string{"tag": "123456", "tag1": "4567899"},
 			},
 		},
 	}
@@ -147,13 +152,15 @@ func getTestAppStateFile() (*AppStateFile, error) {
 	}
 
 	a := AppStateFile{
-		Name:                  "test",
-		Path:                  "/test/test.yaml",
-		Updated:               testGraph.Updated,
+		Name: "test",
+		Path: "/test/test.yaml",
+		Updated: testGraph.Updated,
 		EnvironmentStateGraph: testGraph.EnvironmentStateGraph,
-		ByteContent:           bytes,
-		StringContent:         string(bytes),
+		ByteContent: bytes,
+		StringContent: string(bytes),
 	}
+
 
 	return &a, nil
 }
+

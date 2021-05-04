@@ -165,9 +165,9 @@ func feToBytes(s *[32]byte, h *fieldElement) {
 	q = (h[8] + q) >> 26
 	q = (h[9] + q) >> 25
 
-	// Goal: output h-(2^255-19)q, which is between 0 and 2^255-20.
+	// Goal: Output h-(2^255-19)q, which is between 0 and 2^255-20.
 	h[0] += 19 * q
-	// Goal: output h-2^255 q, which is between 0 and 2^255-20.
+	// Goal: Output h-2^255 q, which is between 0 and 2^255-20.
 
 	carry[0] = h[0] >> 26
 	h[1] += carry[0]
@@ -200,10 +200,10 @@ func feToBytes(s *[32]byte, h *fieldElement) {
 	h[9] -= carry[9] << 25
 	// h10 = carry9
 
-	// Goal: output h[0]+...+2^255 h10-2^255 q, which is between 0 and 2^255-20.
+	// Goal: Output h[0]+...+2^255 h10-2^255 q, which is between 0 and 2^255-20.
 	// Have h[0]+...+2^230 h[9] between 0 and 2^255-1;
 	// evidently 2^255 h10-2^255 q = 0.
-	// Goal: output h[0]+...+2^230 h[9].
+	// Goal: Output h[0]+...+2^230 h[9].
 
 	s[0] = byte(h[0] >> 0)
 	s[1] = byte(h[0] >> 8)

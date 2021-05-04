@@ -36,7 +36,8 @@ type AppConfigurationFile struct {
 
 func NewAppConfigurationFile(path string) (*AppConfigurationFile, error) {
 	a := AppConfiguration{}
-	content, err := home.GetContent(path)
+	iou := new(home.Reader)
+	content, err := home.GetContent(path, iou)
 	if err != nil {
 		return nil, err
 	}

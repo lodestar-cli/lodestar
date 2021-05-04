@@ -49,7 +49,7 @@ YamlKeys is what identifies the keys for Lodestar to look for in the configurati
     info:
       name: lodestar-folder-app-example
       type: folder
-      description: this is a test app
+      description: this is a a app
       repoUrl: https://github.com/lodestar-cli/lodestar-folder-app-example.git
       target: main
       statePath: lodestar-folder-app-example.yaml

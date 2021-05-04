@@ -191,7 +191,7 @@ type commitAllIterator struct {
 }
 
 // NewCommitAllIter returns a new commit iterator for all refs.
-// repoStorer is a repo Storage used to get commits and references.
+// repoStorer is a repo Storer used to get commits and references.
 // commitIterFunc is a commit iterator function, used to iterate through ref commits in chosen order
 func NewCommitAllIter(repoStorer storage.Storer, commitIterFunc func(*Commit) CommitIter) (CommitIter, error) {
 	commitsPath := list.New()

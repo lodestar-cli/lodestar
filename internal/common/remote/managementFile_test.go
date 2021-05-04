@@ -6,7 +6,7 @@ import (
 )
 
 func TestManagementFile_GetByteContent(t *testing.T) {
-	m := getTestManagementFile()
+	m := testManagementFile
 
 	b := m.GetByteContent()
 
@@ -16,7 +16,7 @@ func TestManagementFile_GetByteContent(t *testing.T) {
 }
 
 func TestManagementFile_GetStringContent(t *testing.T) {
-	m := getTestManagementFile()
+	m := testManagementFile
 
 	s := m.GetStringContent()
 
@@ -26,7 +26,7 @@ func TestManagementFile_GetStringContent(t *testing.T) {
 }
 
 func TestManagementFile_GetKeyValues(t *testing.T) {
-	m := getTestManagementFile()
+	m := testManagementFile
 
 	testTable := []struct {
 		KeyList     []string
@@ -51,9 +51,9 @@ func TestManagementFile_GetKeyValues(t *testing.T) {
 		}
 
 		if !test.ExpectError {
-			for k, _ := range kv {
+			for k := range kv {
 				if kv[k] != test.ExpectedMap[k] {
-					t.Errorf("Error after updating EnvironmentStateGraph: for key %s: expected %s but got %s", k, test.ExpectedMap[k], kv[k])
+					t.Errorf("error after updating EnvironmentStateGraph: for key %s: expected %s but got %s", k, test.ExpectedMap[k], kv[k])
 				}
 			}
 		}
@@ -62,7 +62,7 @@ func TestManagementFile_GetKeyValues(t *testing.T) {
 }
 
 func TestManagementFile_UpdateFileContents(t *testing.T) {
-	m := getTestManagementFile()
+	m := testManagementFile
 
 	expectedPass := `
 test: "pass"
@@ -83,7 +83,7 @@ test2: fail2
 
 	// test update
 	for _, test := range testTable {
-		m = getTestManagementFile()
+		m = testManagementFile
 		u, err := m.UpdateFileContents(test.KeyValueMap)
 		if err != nil {
 			if test.ExpectError {
@@ -112,7 +112,7 @@ test2: fail2
 	}
 
 	// test for bad string content
-	m = getTestManagementFile()
+	m = testManagementFile
 	m.StringContent = `
 test: fail
 test1: ""
@@ -123,20 +123,4 @@ test2: fail2
 		t.Error("Expected UpdateFileContents to fail due to empty string value but it passed")
 	}
 
-}
-
-func getTestManagementFile() *ManagementFile {
-	testYaml := `
-test: "fail"
-  test1: fail1
-test2: fail2
-`
-	m := ManagementFile{
-		Name:          "test",
-		Path:          "/test/test.yaml",
-		ByteContent:   []byte(testYaml),
-		StringContent: testYaml,
-	}
-
-	return &m
 }
