@@ -69,7 +69,7 @@ type Repository struct {
 	wt billy.Filesystem
 }
 
-// Init creates an empty git repository, based on the given Storage and worktree.
+// Init creates an empty git repository, based on the given Storer and worktree.
 // The worktree Filesystem is optional, if nil a bare repository is created. If
 // the given storer is not empty ErrRepositoryAlreadyExists is returned
 func Init(s storage.Storer, worktree billy.Filesystem) (*Repository, error) {
@@ -169,7 +169,7 @@ func setConfigWorktree(r *Repository, worktree, storage billy.Filesystem) error 
 	return r.Storer.SetConfig(cfg)
 }
 
-// Open opens a git repository using the given Storage and worktree filesystem,
+// Open opens a git repository using the given Storer and worktree filesystem,
 // if the given storer is complete empty ErrRepositoryNotExists is returned.
 // The worktree can be nil when the repository being opened is bare, if the
 // repository is a normal one (not bare) and worktree is nil the err
@@ -187,7 +187,7 @@ func Open(s storage.Storer, worktree billy.Filesystem) (*Repository, error) {
 	return newRepository(s, worktree), nil
 }
 
-// Clone a repository into the given Storage and worktree Filesystem with the
+// Clone a repository into the given Storer and worktree Filesystem with the
 // given options, if worktree is nil a bare repository is created. If the given
 // storer is not empty ErrRepositoryAlreadyExists is returned.
 //
@@ -198,7 +198,7 @@ func Clone(s storage.Storer, worktree billy.Filesystem, o *CloneOptions) (*Repos
 	return CloneContext(context.Background(), s, worktree, o)
 }
 
-// CloneContext a repository into the given Storage and worktree Filesystem with
+// CloneContext a repository into the given Storer and worktree Filesystem with
 // the given options, if worktree is nil a bare repository is created. If the
 // given storer is not empty ErrRepositoryAlreadyExists is returned.
 //

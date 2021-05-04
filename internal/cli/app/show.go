@@ -9,14 +9,14 @@ import (
 	"github.com/lodestar-cli/lodestar/internal/common/remote"
 )
 
-type ShowCliOptions struct{
-	Username       string
-	Token          string
-	App            string
-	ConfigPath     string
+type ShowCliOptions struct {
+	Username   string
+	Token      string
+	App        string
+	ConfigPath string
 }
 
-type Show struct{
+type Show struct {
 	CliOptions           ShowCliOptions
 	GitAuth              auth.GitCredentials
 	Repository           *remote.LodestarRepository
@@ -24,13 +24,13 @@ type Show struct{
 	AppStateFile         *remote.AppStateFile
 }
 
-func NewShow(username string, token string, app string, configPath string) (*Show, error){
+func NewShow(username string, token string, app string, configPath string) (*Show, error) {
 	var err error
 
 	cli := ShowCliOptions{
-		Username: username,
-		Token: token,
-		App: app,
+		Username:   username,
+		Token:      token,
+		App:        app,
 		ConfigPath: configPath,
 	}
 
@@ -45,7 +45,7 @@ func NewShow(username string, token string, app string, configPath string) (*Sho
 	}
 
 	err = s.setAuth()
-	if err != nil{
+	if err != nil {
 		return nil, err
 	}
 
@@ -54,7 +54,7 @@ func NewShow(username string, token string, app string, configPath string) (*Sho
 	s.Repository, err = remote.NewLodestarRepository(s.AppConfigurationFile.Info.RepoUrl, s.GitAuth)
 
 	//4. Fetch App State File from Repository
-	s.AppStateFile, err = remote.NewAppStateFile(s.Repository,s.AppConfigurationFile.Info.StatePath, s.AppConfigurationFile.Info.Name)
+	s.AppStateFile, err = remote.NewAppStateFile(s.Repository, s.AppConfigurationFile.Info.StatePath, s.AppConfigurationFile.Info.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +75,7 @@ func (s *Show) Execute() {
 func (s *Show) setAppConfigurationFile() error {
 	if s.CliOptions.App == "" && s.CliOptions.ConfigPath == "" {
 		return errors.New("must provide an App name or a path to a configuration file. For more information, run: lodestar app push --help")
-	}else if s.CliOptions.ConfigPath != "" {
+	} else if s.CliOptions.ConfigPath != "" {
 		var err error
 		s.AppConfigurationFile, err = file.NewAppConfigurationFile(s.CliOptions.ConfigPath)
 		if err != nil {
@@ -91,7 +91,7 @@ func (s *Show) setAppConfigurationFile() error {
 	return nil
 }
 
-func (s *Show) setAuth() error{
+func (s *Show) setAuth() error {
 
 	var a auth.GitCredentials
 	if s.CliOptions.Username == "" {
@@ -101,7 +101,7 @@ func (s *Show) setAuth() error{
 	} else {
 		a = &auth.TokenCredentials{
 			Username: s.CliOptions.Username,
-			Token: s.CliOptions.Token,
+			Token:    s.CliOptions.Token,
 		}
 		s.GitAuth = a
 	}

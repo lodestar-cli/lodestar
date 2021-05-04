@@ -9,12 +9,12 @@ import (
 )
 
 type Info struct {
-	Name string   `yaml:"name"`
-	Type string `yaml:"type"`
+	Name        string `yaml:"name"`
+	Type        string `yaml:"type"`
 	Description string `yaml:"description"`
-	RepoUrl string `yaml:"repoUrl"`
-	Target string `yaml:"target"`
-	StatePath string `yaml:"statePath"`
+	RepoUrl     string `yaml:"repoUrl"`
+	Target      string `yaml:"target"`
+	StatePath   string `yaml:"statePath"`
 }
 
 type AppConfiguration struct {
@@ -24,7 +24,7 @@ type AppConfiguration struct {
 }
 
 //LodestarFile
-type AppConfigurationFile struct{
+type AppConfigurationFile struct {
 	Path             string
 	Name             string
 	Info             Info
@@ -34,9 +34,10 @@ type AppConfigurationFile struct{
 	StringContent    string
 }
 
-func NewAppConfigurationFile(path string) (*AppConfigurationFile, error){
+func NewAppConfigurationFile(path string) (*AppConfigurationFile, error) {
 	a := AppConfiguration{}
-	content, err := home.GetContent(path)
+	iou := new(home.Reader)
+	content, err := home.GetContent(path, iou)
 	if err != nil {
 		return nil, err
 	}
@@ -48,13 +49,13 @@ func NewAppConfigurationFile(path string) (*AppConfigurationFile, error){
 	}
 
 	f := AppConfigurationFile{
-		Path: path,
-		Name: a.Info.Name,
-		Info: a.Info,
+		Path:             path,
+		Name:             a.Info.Name,
+		Info:             a.Info,
 		EnvironmentGraph: a.EnvGraph,
-		YamlKeys: a.YamlKeys,
-		ByteContent: content,
-		StringContent: string(content),
+		YamlKeys:         a.YamlKeys,
+		ByteContent:      content,
+		StringContent:    string(content),
 	}
 
 	return &f, nil
@@ -73,11 +74,11 @@ func (a *AppConfigurationFile) Print() {
 	fmt.Println(a.StringContent)
 }
 
-func (a *AppConfigurationFile)GetStringContent() string {
+func (a *AppConfigurationFile) GetStringContent() string {
 	return a.StringContent
 }
 
-func (a *AppConfigurationFile)GetByteContent() []byte {
+func (a *AppConfigurationFile) GetByteContent() []byte {
 	return a.ByteContent
 }
 

@@ -9,47 +9,47 @@ import (
 )
 
 type AppStateGraph struct {
-	Updated               string             `yaml:"updated"`
+	Updated               string                         `yaml:"updated"`
 	EnvironmentStateGraph []environment.EnvironmentState `yaml:"environmentStateGraph"`
 }
 
 //LodestarFile
 type AppStateFile struct {
-	Path             string
-	Name             string
-	Updated          string
-	EnvironmentGraph []environment.EnvironmentState
-	ByteContent      []byte
-	StringContent    string
+	Path                  string
+	Name                  string
+	Updated               string
+	EnvironmentStateGraph []environment.EnvironmentState
+	ByteContent           []byte
+	StringContent         string
 }
 
-func NewAppStateFile(repository *LodestarRepository, path string, name string) (*AppStateFile, error){
+func NewAppStateFile(repository *LodestarRepository, path string, name string) (*AppStateFile, error) {
 	stat, err := repository.FileSystem.Stat(path)
-	if err != nil{
+	if err != nil {
 		return nil, err
 	}
 	bytes := make([]byte, stat.Size())
 
 	//get file from memory
 	file, err := repository.FileSystem.Open(path)
-	if err != nil{
+	if err != nil {
 		return nil, err
 	}
 	//get file content as string
 	_, err = file.Read(bytes)
-	if err != nil{
+	if err != nil {
 		return nil, err
 	}
 
 	a := AppStateFile{
-		Name: name+"-state",
-		Path: path,
-		ByteContent: bytes,
+		Name:          name + "-state",
+		Path:          path,
+		ByteContent:   bytes,
 		StringContent: string(bytes),
 	}
 
 	err = a.setAppStateGraphFields()
-	if err != nil{
+	if err != nil {
 		return nil, err
 	}
 
@@ -58,7 +58,7 @@ func NewAppStateFile(repository *LodestarRepository, path string, name string) (
 
 //LodestarFile Interface Functions
 
-func (a *AppStateFile) Print(){
+func (a *AppStateFile) Print() {
 	fmt.Println(a.StringContent)
 }
 
@@ -71,21 +71,21 @@ func (a *AppStateFile) Output() error {
 	return nil
 }
 
-func (a *AppStateFile)GetStringContent() string {
+func (a *AppStateFile) GetStringContent() string {
 	return a.StringContent
 }
 
-func (a *AppStateFile)GetByteContent() []byte {
+func (a *AppStateFile) GetByteContent() []byte {
 	return a.ByteContent
 }
 
 //AppState Specific Functions
 
-func (a *AppStateFile) UpdateEnvironmentGraph(env string, keys map[string]string) (bool, error) {
-	for _, e := range a.EnvironmentGraph{
+func (a *AppStateFile) UpdateEnvironmentStateGraph(env string, keys map[string]string) (bool, error) {
+	for _, e := range a.EnvironmentStateGraph {
 		if e.Name == env {
 			update := e.UpdateKeys(keys)
-			if update{
+			if update {
 				return true, nil
 			} else {
 				return false, nil
@@ -95,16 +95,16 @@ func (a *AppStateFile) UpdateEnvironmentGraph(env string, keys map[string]string
 	return false, fmt.Errorf("%s does not exist in this app", env)
 }
 
-func (a *AppStateFile)UpdateFile() error {
+func (a *AppStateFile) UpdateFile() error {
 
 	a.Updated = time.Now().Format(time.RFC3339)
 
 	s := AppStateGraph{
-		Updated: a.Updated,
-		EnvironmentStateGraph: a.EnvironmentGraph,
+		Updated:               a.Updated,
+		EnvironmentStateGraph: a.EnvironmentStateGraph,
 	}
 
-	bytes ,err := yaml.Marshal(s)
+	bytes, err := yaml.Marshal(s)
 	if err != nil {
 		return err
 	}
@@ -122,7 +122,7 @@ func (a *AppStateFile) setAppStateGraphFields() error {
 		return err
 	}
 
-	a.EnvironmentGraph = stateGraph.EnvironmentStateGraph
+	a.EnvironmentStateGraph = stateGraph.EnvironmentStateGraph
 	a.Updated = stateGraph.Updated
 
 	return nil

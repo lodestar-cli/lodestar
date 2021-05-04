@@ -12,27 +12,26 @@ type TokenCredentials struct {
 	Token    string
 }
 
-func (t *TokenCredentials) CreateCloneOptions(url string) (*git.CloneOptions, error){
+func (t *TokenCredentials) CreateCloneOptions(url string) (*git.CloneOptions, error) {
 
 	auth := http.BasicAuth{
 		Username: t.Username,
 		Password: t.Token,
 	}
 
-
 	cloneOptions := &git.CloneOptions{
-		URL : url,
+		URL:  url,
 		Auth: &auth,
 	}
 
 	return cloneOptions, nil
 }
 
-func (t *TokenCredentials) CreateCommitOptions() (*git.CommitOptions, error){
+func (t *TokenCredentials) CreateCommitOptions() (*git.CommitOptions, error) {
 	signature := &object.Signature{
-		Name: t.Username,
+		Name:  t.Username,
 		Email: t.Username,
-		When: time.Now(),
+		When:  time.Now(),
 	}
 
 	commitOptions := git.CommitOptions{
@@ -42,7 +41,7 @@ func (t *TokenCredentials) CreateCommitOptions() (*git.CommitOptions, error){
 	return &commitOptions, nil
 }
 
-func (t *TokenCredentials) CreatePushOptions() (*git.PushOptions, error){
+func (t *TokenCredentials) CreatePushOptions() (*git.PushOptions, error) {
 
 	auth := &http.BasicAuth{
 		Username: t.Username,
@@ -51,7 +50,7 @@ func (t *TokenCredentials) CreatePushOptions() (*git.PushOptions, error){
 
 	pushOptions := &git.PushOptions{
 		RemoteName: "origin",
-		Auth: auth,
+		Auth:       auth,
 	}
 
 	return pushOptions, nil

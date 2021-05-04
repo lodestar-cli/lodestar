@@ -11,17 +11,17 @@ import (
 	"sync"
 )
 
-type PromoteCliOptions struct{
-	Username             string
-	Token                string
-	App                  string
-	ConfigPath           string
-	SrcEnvironment       string
-	DestEnvironment      string
+type PromoteCliOptions struct {
+	Username        string
+	Token           string
+	App             string
+	ConfigPath      string
+	SrcEnvironment  string
+	DestEnvironment string
 }
 
-type Promote struct{
-	CliOptions PromoteCliOptions
+type Promote struct {
+	CliOptions           PromoteCliOptions
 	GitAuth              auth.GitCredentials
 	SrcEnvironment       *environment.Environment
 	DestEnvironment      *environment.Environment
@@ -30,7 +30,7 @@ type Promote struct{
 	AppStateFile         *remote.AppStateFile
 }
 
-func NewPromote(username string, token string, app string, configPath string, srcEnv string, destEnv string) (*Promote,error){
+func NewPromote(username string, token string, app string, configPath string, srcEnv string, destEnv string) (*Promote, error) {
 	var err error
 	var wg sync.WaitGroup
 	fatalErrors := make(chan error)
@@ -39,12 +39,12 @@ func NewPromote(username string, token string, app string, configPath string, sr
 	defer close(finish)
 
 	cli := PromoteCliOptions{
-		Username: username,
-		Token: token,
-		App: app,
-		SrcEnvironment: srcEnv,
+		Username:        username,
+		Token:           token,
+		App:             app,
+		SrcEnvironment:  srcEnv,
 		DestEnvironment: destEnv,
-		ConfigPath: configPath,
+		ConfigPath:      configPath,
 	}
 
 	p := Promote{
@@ -59,16 +59,16 @@ func NewPromote(username string, token string, app string, configPath string, sr
 
 	//2. Get Environments from AppConfig as well as Auth.  Check to make sure keys given match the ones in the AppConfig file
 	wg.Add(3)
-	go p.setEnvironment(fatalErrors, "src",&wg)
-	go p.setEnvironment(fatalErrors, "dest",&wg)
+	go p.setEnvironment(fatalErrors, "src", &wg)
+	go p.setEnvironment(fatalErrors, "dest", &wg)
 	go p.setAuth(fatalErrors, &wg)
-	go func(){
+	go func() {
 		wg.Wait()
 		finish <- true
 	}()
 
 	select {
-	case <- finish:
+	case <-finish:
 		break
 	case err = <-fatalErrors:
 		return nil, err
@@ -79,7 +79,7 @@ func NewPromote(username string, token string, app string, configPath string, sr
 	p.Repository, err = remote.NewLodestarRepository(p.AppConfigurationFile.Info.RepoUrl, p.GitAuth)
 
 	//4. Fetch App State File from Repository
-	p.AppStateFile, err = remote.NewAppStateFile(p.Repository,p.AppConfigurationFile.Info.StatePath, p.AppConfigurationFile.Info.Name)
+	p.AppStateFile, err = remote.NewAppStateFile(p.Repository, p.AppConfigurationFile.Info.StatePath, p.AppConfigurationFile.Info.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -96,15 +96,15 @@ func (p *Promote) Execute() error {
 	var err error
 	var keysMap map[string]string
 
-	fmt.Printf("Retrieving key values from configuration file %s...\n",p.SrcEnvironment.Name)
+	fmt.Printf("Retrieving key values from configuration file %s...\n", p.SrcEnvironment.Name)
 
 	cmfChannel := make(chan *remote.ManagementFile, 2)
 	var dmf *remote.ManagementFile
 	wg.Add(2)
 
-	go p.getCurrentManagementFile(fatalErrors, cmfChannel, p.SrcEnvironment,&wg)
-	go p.getCurrentManagementFile(fatalErrors, cmfChannel, p.DestEnvironment,&wg)
-	go func(){
+	go p.getCurrentManagementFile(fatalErrors, cmfChannel, p.SrcEnvironment, &wg)
+	go p.getCurrentManagementFile(fatalErrors, cmfChannel, p.DestEnvironment, &wg)
+	go func() {
 		wg.Wait()
 		close(cmfChannel)
 		finish <- true
@@ -113,7 +113,7 @@ func (p *Promote) Execute() error {
 	select {
 	case <-finish:
 		for f := range cmfChannel {
-			switch f.Path{
+			switch f.Path {
 			case p.SrcEnvironment.SrcPath:
 				keysMap, err = f.GetKeyValues(p.AppConfigurationFile.YamlKeys)
 			case p.DestEnvironment.SrcPath:
@@ -129,17 +129,17 @@ func (p *Promote) Execute() error {
 
 	fmt.Printf("Updating %s environment to %s environment's keys...\n", p.DestEnvironment.Name, p.SrcEnvironment.Name)
 	go p.updateAppStateFile(fatalErrors, fileChannel, keysMap, &wg)
-	go p.updateManagementFile(fatalErrors, fileChannel,dmf, keysMap, &wg)
+	go p.updateManagementFile(fatalErrors, fileChannel, dmf, keysMap, &wg)
 
-	go func(){
+	go func() {
 		wg.Wait()
 		close(fileChannel)
 		finish <- true
 	}()
 
 	select {
-	case <- finish:
-		for f := range fileChannel{
+	case <-finish:
+		for f := range fileChannel {
 			updatedFiles = append(updatedFiles, f)
 		}
 
@@ -149,10 +149,10 @@ func (p *Promote) Execute() error {
 		case 1:
 			fmt.Printf("WARNING: %s environment's state and management files were out of sync. Syncing files to newest push\n", p.DestEnvironment.Name)
 			err = p.Repository.CommitFiles(fmt.Sprintf("Lodestar updated %v in %s environment", p.AppConfigurationFile.YamlKeys, p.DestEnvironment.Name), updatedFiles...)
-			if err != nil{
+			if err != nil {
 				return err
 			}
-			fmt.Printf("Pushing changes to %s as %s...\n",p.AppConfigurationFile.Info.RepoUrl,p.CliOptions.Username)
+			fmt.Printf("Pushing changes to %s as %s...\n", p.AppConfigurationFile.Info.RepoUrl, p.CliOptions.Username)
 			err = p.Repository.Push()
 			if err != nil {
 				return err
@@ -160,10 +160,10 @@ func (p *Promote) Execute() error {
 			fmt.Println("Push complete!")
 		default:
 			err = p.Repository.CommitFiles(fmt.Sprintf("Lodestar updated %v in %s environment", p.AppConfigurationFile.YamlKeys, p.DestEnvironment.Name), updatedFiles...)
-			if err != nil{
+			if err != nil {
 				return err
 			}
-			fmt.Printf("Pushing changes to %s as %s...\n",p.AppConfigurationFile.Info.RepoUrl,p.CliOptions.Username)
+			fmt.Printf("Pushing changes to %s as %s...\n", p.AppConfigurationFile.Info.RepoUrl, p.CliOptions.Username)
 			err = p.Repository.Push()
 			if err != nil {
 				return err
@@ -178,8 +178,8 @@ func (p *Promote) Execute() error {
 	return nil
 }
 
-func (p *Promote) Output(b bool) error{
-	if b{
+func (p *Promote) Output(b bool) error {
+	if b {
 		err := p.AppStateFile.Output()
 		if err != nil {
 			return err
@@ -191,11 +191,11 @@ func (p *Promote) Output(b bool) error{
 	return nil
 }
 
-func (p *Promote) getCurrentManagementFile(fatalErrors chan error, cmfChannel chan *remote.ManagementFile, env *environment.Environment,wg *sync.WaitGroup){
+func (p *Promote) getCurrentManagementFile(fatalErrors chan error, cmfChannel chan *remote.ManagementFile, env *environment.Environment, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	m, err := remote.NewManagementFile(env, p.Repository)
-	if err != nil{
+	if err != nil {
 		fatalErrors <- err
 		return
 	}
@@ -206,11 +206,11 @@ func (p *Promote) getCurrentManagementFile(fatalErrors chan error, cmfChannel ch
 func (p *Promote) updateAppStateFile(fatalErrors chan error, fileChannel chan remote.LodestarFile, keysMap map[string]string, wg *sync.WaitGroup) {
 	defer wg.Done()
 	var l remote.LodestarFile
-	updated, err := p.AppStateFile.UpdateEnvironmentGraph(p.DestEnvironment.Name, keysMap)
-	if err != nil{
+	updated, err := p.AppStateFile.UpdateEnvironmentStateGraph(p.DestEnvironment.Name, keysMap)
+	if err != nil {
 		fatalErrors <- err
 	}
-	if updated{
+	if updated {
 		err = p.AppStateFile.UpdateFile()
 		if err != nil {
 			fatalErrors <- err
@@ -225,20 +225,19 @@ func (p *Promote) updateManagementFile(fatalErrors chan error, fileChannel chan 
 	var l remote.LodestarFile
 
 	updated, err := smf.UpdateFileContents(keysMap)
-	if err != nil{
+	if err != nil {
 		fatalErrors <- err
 	}
-	if updated{
+	if updated {
 		l = smf
 		fileChannel <- l
 	}
 }
 
-
 func (p *Promote) setAppConfigurationFile() error {
 	if p.CliOptions.App == "" && p.CliOptions.ConfigPath == "" {
 		return errors.New("must provide an App name or a path to a configuration file. For more information, run: lodestar app push --help")
-	}else if p.CliOptions.ConfigPath != "" {
+	} else if p.CliOptions.ConfigPath != "" {
 		var err error
 		p.AppConfigurationFile, err = file.NewAppConfigurationFile(p.CliOptions.ConfigPath)
 		if err != nil {
@@ -283,7 +282,7 @@ func (p *Promote) setAuth(fatalErrors chan error, wg *sync.WaitGroup) {
 	} else {
 		a = &auth.TokenCredentials{
 			Username: p.CliOptions.Username,
-			Token: p.CliOptions.Token,
+			Token:    p.CliOptions.Token,
 		}
 		p.GitAuth = a
 	}

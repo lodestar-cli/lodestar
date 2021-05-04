@@ -36,9 +36,9 @@ which will walk you through creating an appConfiguration.  This will automatical
 
 The Info object holds the metadata about your application so that Lodestar know's what repository holds the manifests and where the app state file is located at.  This also holds the name and the description of the app so others can easily identify what is being updated.
 
-#### EnvironmentGraph
+#### EnvironmentStateGraph
 
-The EnvironmentGraph is waht helps lodestar located the files it will be updating for each environment.  It is important to keep this part up to date so that Lodestar can find the files correctly and update tehm when your run a push or a promote.
+The EnvironmentStateGraph is waht helps lodestar located the files it will be updating for each environment.  It is important to keep this part up to date so that Lodestar can find the files correctly and update tehm when your run a push or a promote.
 
 #### YamlKeys
 
@@ -49,7 +49,7 @@ YamlKeys is what identifies the keys for Lodestar to look for in the configurati
     info:
       name: lodestar-folder-app-example
       type: folder
-      description: this is a test app
+      description: this is a a app
       repoUrl: https://github.com/lodestar-cli/lodestar-folder-app-example.git
       target: main
       statePath: lodestar-folder-app-example.yaml

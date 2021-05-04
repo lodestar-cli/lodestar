@@ -134,7 +134,7 @@ func (w *Worktree) buildCommitSignature(commit *object.Commit, signKey *openpgp.
 
 // buildTreeHelper converts a given index.Index file into multiple git objects
 // reading the blobs from the given filesystem and creating the trees from the
-// index structure. The created objects are pushed to a given Storage.
+// index structure. The created objects are pushed to a given Storer.
 type buildTreeHelper struct {
 	fs billy.Filesystem
 	s  storage.Storer

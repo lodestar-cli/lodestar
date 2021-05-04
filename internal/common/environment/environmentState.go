@@ -9,14 +9,14 @@ type EnvironmentState struct {
 func (e *EnvironmentState) UpdateKeys(keys map[string]string) bool {
 	update := false
 
-	for k,v := range keys{
+	for k, v := range keys {
 		val, ok := e.YamlKeys[k]
 		if ok {
-			if v != val{
+			if v != val {
 				e.YamlKeys[k] = v
 				update = true
 			}
-		} else{
+		} else {
 			e.YamlKeys[k] = v
 		}
 	}
