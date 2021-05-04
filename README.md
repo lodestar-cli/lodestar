@@ -1,6 +1,7 @@
 # Lodestar
-
 **Guide your applications through all of their environments**
+
+[![Go Report Card](https://goreportcard.com/badge/github.com/lodestar-cli/lodestar)](https://goreportcard.com/report/github.com/lodestar-cli/lodestar)
 
 ## Overview
 
