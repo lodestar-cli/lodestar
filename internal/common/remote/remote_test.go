@@ -16,24 +16,24 @@ import (
 )
 
 type TestUser struct {
-	Username    string `yaml:"gitUser"`
-	Token       string `yaml:"gitToken"`
+	Username string `yaml:"gitUser"`
+	Token    string `yaml:"gitToken"`
 }
 
-var(
-	testUser = TestUser{}
-	testRepository = LodestarRepository{}
+var (
+	testUser           = TestUser{}
+	testRepository     = LodestarRepository{}
 	testManagementFile = ManagementFile{}
 )
 
 func TestMain(m *testing.M) {
 	err := setTestUser()
-	if err != nil{
+	if err != nil {
 		fmt.Printf("error setting test user: %s", err)
 	}
 
 	err = setTestLodestarRepository()
-	if err != nil{
+	if err != nil {
 		fmt.Printf("error setting test repository: %s", err)
 	}
 
@@ -45,10 +45,10 @@ func TestMain(m *testing.M) {
 func setTestLodestarRepository() error {
 	var err error
 
-	testRepository.Url ="https://github.com/lodestar-cli/lodestar-folder-app-example.git"
+	testRepository.Url = "https://github.com/lodestar-cli/lodestar-folder-app-example.git"
 	testRepository.Credentials = &auth.TokenCredentials{
 		Username: testUser.Username,
-		Token: testUser.Token,
+		Token:    testUser.Token,
 	}
 	testRepository.FileSystem = memfs.New()
 	testRepository.Storage = memory.NewStorage()
@@ -69,7 +69,7 @@ func setTestLodestarRepository() error {
 	}
 
 	testRepository.Worktree, err = testRepository.Repository.Worktree()
-	if err != nil{
+	if err != nil {
 		return err
 	}
 

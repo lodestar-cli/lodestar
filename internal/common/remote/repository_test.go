@@ -14,16 +14,16 @@ func TestNewLodestarRepository(t *testing.T) {
 
 	cPass = &auth.TokenCredentials{
 		Username: testUser.Username,
-		Token: testUser.Token,
+		Token:    testUser.Token,
 	}
 
 	cFail = &auth.TokenCredentials{
 		Username: "badUser",
-		Token: "badToken",
+		Token:    "badToken",
 	}
 
 	testTable := []struct {
-		Url     string
+		Url         string
 		Credentials auth.GitCredentials
 		ExpectError bool
 	}{
@@ -33,17 +33,17 @@ func TestNewLodestarRepository(t *testing.T) {
 		{"https://github.com/lodestar-cli/lodestar-folder-app-example.git", cFail, true},
 	}
 
-	for _ , test := range testTable{
-		r, err := NewLodestarRepository(test.Url,test.Credentials)
-		if err != nil{
-			if test.ExpectError{
+	for _, test := range testTable {
+		r, err := NewLodestarRepository(test.Url, test.Credentials)
+		if err != nil {
+			if test.ExpectError {
 				continue
 			} else {
 				t.Errorf("error creating lodestar repository: %s", err)
 			}
 		}
 
-		if r.Repository == nil{
+		if r.Repository == nil {
 			t.Error("NewLodestarRepository did not clone a repository")
 		}
 
@@ -87,7 +87,7 @@ func TestNewLodestarRepository(t *testing.T) {
 	}
 }*/
 
-func setTestAppStateFileForCommit(path string)  (*AppStateFile, error) {
+func setTestAppStateFileForCommit(path string) (*AppStateFile, error) {
 	testGraph := AppStateGraph{
 		Updated: time.Now().Format(time.RFC3339),
 		EnvironmentStateGraph: []environment.EnvironmentState{
@@ -115,19 +115,18 @@ func setTestAppStateFileForCommit(path string)  (*AppStateFile, error) {
 	}
 
 	a := AppStateFile{
-		Name: "test",
-		Path: path,
-		Updated: testGraph.Updated,
+		Name:                  "test",
+		Path:                  path,
+		Updated:               testGraph.Updated,
 		EnvironmentStateGraph: testGraph.EnvironmentStateGraph,
-		ByteContent: bytes,
-		StringContent: string(bytes),
+		ByteContent:           bytes,
+		StringContent:         string(bytes),
 	}
-
 
 	return &a, nil
 }
 
-func setManagementFileForCommit(path string){
+func setManagementFileForCommit(path string) {
 	m := ManagementFile{
 		Name: "dev-config",
 		Path: path,

@@ -21,9 +21,9 @@ type LodestarRepository struct {
 }
 
 func NewLodestarRepository(url string, credentials auth.GitCredentials) (*LodestarRepository, error) {
-	if url == ""{
+	if url == "" {
 		return nil, errors.New("cannot clone repository. Url cannot be blank")
-	} else if !strings.Contains(url, "https://"){
+	} else if !strings.Contains(url, "https://") {
 		if !strings.Contains(url, "http://") {
 			return nil, errors.New("cannot clone repository. Url must be of schema http or https")
 		}
@@ -34,8 +34,8 @@ func NewLodestarRepository(url string, credentials auth.GitCredentials) (*Lodest
 		FileSystem:  memfs.New(),
 		Credentials: credentials,
 		Storage:     memory.NewStorage(),
-		Repository: new(git.Repository),
-		Worktree:   new(git.Worktree),
+		Repository:  new(git.Repository),
+		Worktree:    new(git.Worktree),
 	}
 
 	err := r.setRepository()
