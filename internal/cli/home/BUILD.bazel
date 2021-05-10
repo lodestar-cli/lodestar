@@ -1,8 +1,18 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library")
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
 
 go_library(
     name = "home",
-    srcs = ["home.go"],
+    srcs = [
+        "home.go",
+        "reader.go",
+    ],
     importpath = "github.com/lodestar-cli/lodestar/internal/cli/home",
     visibility = ["//:__subpackages__"],
+)
+
+go_test(
+    name = "home_test",
+    srcs = ["home_test.go"],
+    embed = [":home"],
+    deps = ["//internal/cli/home/mocks"],
 )

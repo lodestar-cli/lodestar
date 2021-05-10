@@ -1,4 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library")
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
 
 go_library(
     name = "remote",
@@ -18,5 +18,26 @@ go_library(
         "//vendor/github.com/go-git/go-git/v5:go-git",
         "//vendor/github.com/go-git/go-git/v5/storage/memory",
         "//vendor/github.com/goccy/go-yaml",
+    ],
+)
+
+go_test(
+    name = "remote_test",
+    srcs = [
+        "appStateFile_test.go",
+        "managementFile_test.go",
+        "remote_test.go",
+        "repository_test.go",
+    ],
+    embed = [":remote"],
+    deps = [
+        "//internal/common/auth",
+        "//internal/common/environment",
+        "//vendor/github.com/go-git/go-billy/v5/memfs",
+        "//vendor/github.com/go-git/go-git/v5:go-git",
+        "//vendor/github.com/go-git/go-git/v5/plumbing/transport/http",
+        "//vendor/github.com/go-git/go-git/v5/storage/memory",
+        "//vendor/github.com/goccy/go-yaml",
+        "//vendor/go.mozilla.org/sops/v3/decrypt",
     ],
 )

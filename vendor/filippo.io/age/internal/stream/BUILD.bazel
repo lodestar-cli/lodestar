@@ -1,0 +1,13 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "stream",
+    srcs = ["stream.go"],
+    importmap = "github.com/lodestar-cli/lodestar/vendor/filippo.io/age/internal/stream",
+    importpath = "filippo.io/age/internal/stream",
+    visibility = ["//vendor/filippo.io/age:__subpackages__"],
+    deps = [
+        "//vendor/golang.org/x/crypto/chacha20poly1305",
+        "//vendor/golang.org/x/crypto/poly1305",
+    ],
+)

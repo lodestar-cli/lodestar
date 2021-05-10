@@ -1,0 +1,19 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "parser",
+    srcs = [
+        "context.go",
+        "parser.go",
+    ],
+    importmap = "github.com/lodestar-cli/lodestar/vendor/github.com/goccy/go-yaml/parser",
+    importpath = "github.com/goccy/go-yaml/parser",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//vendor/github.com/goccy/go-yaml/ast",
+        "//vendor/github.com/goccy/go-yaml/internal/errors",
+        "//vendor/github.com/goccy/go-yaml/lexer",
+        "//vendor/github.com/goccy/go-yaml/token",
+        "//vendor/golang.org/x/xerrors",
+    ],
+)

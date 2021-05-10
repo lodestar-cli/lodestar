@@ -1,0 +1,15 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "age",
+    srcs = ["keysource.go"],
+    importmap = "github.com/lodestar-cli/lodestar/vendor/go.mozilla.org/sops/v3/age",
+    importpath = "go.mozilla.org/sops/v3/age",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//vendor/filippo.io/age",
+        "//vendor/filippo.io/age/armor",
+        "//vendor/github.com/sirupsen/logrus",
+        "//vendor/go.mozilla.org/sops/v3/logging",
+    ],
+)

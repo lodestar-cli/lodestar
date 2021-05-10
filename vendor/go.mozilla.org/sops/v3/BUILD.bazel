@@ -1,0 +1,24 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "sops",
+    srcs = [
+        "sops.go",
+        "usererrors.go",
+    ],
+    importmap = "github.com/lodestar-cli/lodestar/vendor/go.mozilla.org/sops/v3",
+    importpath = "go.mozilla.org/sops/v3",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//vendor/github.com/fatih/color",
+        "//vendor/github.com/goware/prefixer",
+        "//vendor/github.com/mitchellh/go-wordwrap",
+        "//vendor/github.com/sirupsen/logrus",
+        "//vendor/go.mozilla.org/sops/v3/audit",
+        "//vendor/go.mozilla.org/sops/v3/keys",
+        "//vendor/go.mozilla.org/sops/v3/keyservice",
+        "//vendor/go.mozilla.org/sops/v3/logging",
+        "//vendor/go.mozilla.org/sops/v3/shamir",
+        "//vendor/golang.org/x/net/context",
+    ],
+)

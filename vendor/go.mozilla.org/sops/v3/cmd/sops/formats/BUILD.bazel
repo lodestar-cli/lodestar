@@ -1,0 +1,9 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "formats",
+    srcs = ["formats.go"],
+    importmap = "github.com/lodestar-cli/lodestar/vendor/go.mozilla.org/sops/v3/cmd/sops/formats",
+    importpath = "go.mozilla.org/sops/v3/cmd/sops/formats",
+    visibility = ["//visibility:public"],
+)

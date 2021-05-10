@@ -1,0 +1,30 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "keyservice",
+    srcs = [
+        "client.go",
+        "keyservice.go",
+        "keyservice.pb.go",
+        "server.go",
+    ],
+    importmap = "github.com/lodestar-cli/lodestar/vendor/go.mozilla.org/sops/v3/keyservice",
+    importpath = "go.mozilla.org/sops/v3/keyservice",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//vendor/github.com/golang/protobuf/proto",
+        "//vendor/go.mozilla.org/sops/v3/age",
+        "//vendor/go.mozilla.org/sops/v3/azkv",
+        "//vendor/go.mozilla.org/sops/v3/gcpkms",
+        "//vendor/go.mozilla.org/sops/v3/hcvault",
+        "//vendor/go.mozilla.org/sops/v3/keys",
+        "//vendor/go.mozilla.org/sops/v3/kms",
+        "//vendor/go.mozilla.org/sops/v3/pgp",
+        "//vendor/golang.org/x/net/context",
+        "//vendor/google.golang.org/grpc",
+        "//vendor/google.golang.org/grpc/codes",
+        "//vendor/google.golang.org/grpc/status",
+        "//vendor/google.golang.org/protobuf/reflect/protoreflect",
+        "//vendor/google.golang.org/protobuf/runtime/protoimpl",
+    ],
+)

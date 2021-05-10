@@ -1,0 +1,14 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "ini",
+    srcs = ["store.go"],
+    importmap = "github.com/lodestar-cli/lodestar/vendor/go.mozilla.org/sops/v3/stores/ini",
+    importpath = "go.mozilla.org/sops/v3/stores/ini",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//vendor/go.mozilla.org/sops/v3:sops",
+        "//vendor/go.mozilla.org/sops/v3/stores",
+        "//vendor/gopkg.in/ini.v1:ini_v1",
+    ],
+)

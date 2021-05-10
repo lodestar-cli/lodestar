@@ -1,0 +1,15 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "cloudkms",
+    srcs = ["cloudkms-gen.go"],
+    importmap = "github.com/lodestar-cli/lodestar/vendor/google.golang.org/api/cloudkms/v1",
+    importpath = "google.golang.org/api/cloudkms/v1",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//vendor/google.golang.org/api/gensupport",
+        "//vendor/google.golang.org/api/googleapi",
+        "//vendor/google.golang.org/api/option",
+        "//vendor/google.golang.org/api/transport/http",
+    ],
+)

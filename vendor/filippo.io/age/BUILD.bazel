@@ -1,0 +1,24 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "age",
+    srcs = [
+        "age.go",
+        "parse.go",
+        "primitives.go",
+        "scrypt.go",
+        "x25519.go",
+    ],
+    importmap = "github.com/lodestar-cli/lodestar/vendor/filippo.io/age",
+    importpath = "filippo.io/age",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//vendor/filippo.io/age/internal/bech32",
+        "//vendor/filippo.io/age/internal/format",
+        "//vendor/filippo.io/age/internal/stream",
+        "//vendor/golang.org/x/crypto/chacha20poly1305",
+        "//vendor/golang.org/x/crypto/curve25519",
+        "//vendor/golang.org/x/crypto/hkdf",
+        "//vendor/golang.org/x/crypto/scrypt",
+    ],
+)
