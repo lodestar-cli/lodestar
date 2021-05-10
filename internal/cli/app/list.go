@@ -2,6 +2,7 @@ package app
 
 import (
 	"fmt"
+
 	"github.com/lodestar-cli/lodestar/internal/cli/file"
 	"github.com/lodestar-cli/lodestar/internal/cli/home"
 )

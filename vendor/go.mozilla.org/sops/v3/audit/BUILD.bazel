@@ -1,0 +1,16 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "audit",
+    srcs = ["audit.go"],
+    importmap = "github.com/lodestar-cli/lodestar/vendor/go.mozilla.org/sops/v3/audit",
+    importpath = "go.mozilla.org/sops/v3/audit",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//vendor/github.com/lib/pq",
+        "//vendor/github.com/pkg/errors",
+        "//vendor/github.com/sirupsen/logrus",
+        "//vendor/go.mozilla.org/sops/v3/logging",
+        "//vendor/gopkg.in/yaml.v3:yaml_v3",
+    ],
+)

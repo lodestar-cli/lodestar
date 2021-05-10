@@ -216,6 +216,10 @@ github.com/konsorten/go-windows-terminal-sequences
 github.com/lib/pq
 github.com/lib/pq/oid
 github.com/lib/pq/scram
+# github.com/magefile/mage v1.11.0
+## explicit
+github.com/magefile/mage/mg
+github.com/magefile/mage/sh
 # github.com/mattn/go-colorable v0.1.8
 github.com/mattn/go-colorable
 # github.com/mattn/go-isatty v0.0.12

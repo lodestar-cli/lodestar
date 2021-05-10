@@ -1,0 +1,12 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "prefixer",
+    srcs = [
+        "doc.go",
+        "prefixer.go",
+    ],
+    importmap = "github.com/lodestar-cli/lodestar/vendor/github.com/goware/prefixer",
+    importpath = "github.com/goware/prefixer",
+    visibility = ["//visibility:public"],
+)

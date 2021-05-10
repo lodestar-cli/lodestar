@@ -1,0 +1,17 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "pgp",
+    srcs = ["keysource.go"],
+    importmap = "github.com/lodestar-cli/lodestar/vendor/go.mozilla.org/sops/v3/pgp",
+    importpath = "go.mozilla.org/sops/v3/pgp",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//vendor/github.com/howeyc/gopass",
+        "//vendor/github.com/sirupsen/logrus",
+        "//vendor/go.mozilla.org/gopgagent",
+        "//vendor/go.mozilla.org/sops/v3/logging",
+        "//vendor/golang.org/x/crypto/openpgp",
+        "//vendor/golang.org/x/crypto/openpgp/armor",
+    ],
+)

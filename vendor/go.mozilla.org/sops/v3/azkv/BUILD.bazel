@@ -1,0 +1,17 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "azkv",
+    srcs = ["keysource.go"],
+    importmap = "github.com/lodestar-cli/lodestar/vendor/go.mozilla.org/sops/v3/azkv",
+    importpath = "go.mozilla.org/sops/v3/azkv",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//vendor/github.com/Azure/azure-sdk-for-go/services/keyvault/2016-10-01/keyvault",
+        "//vendor/github.com/Azure/go-autorest/autorest",
+        "//vendor/github.com/Azure/go-autorest/autorest/azure",
+        "//vendor/github.com/Azure/go-autorest/autorest/azure/auth",
+        "//vendor/github.com/sirupsen/logrus",
+        "//vendor/go.mozilla.org/sops/v3/logging",
+    ],
+)

@@ -1,0 +1,14 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "yaml",
+    srcs = ["store.go"],
+    importmap = "github.com/lodestar-cli/lodestar/vendor/go.mozilla.org/sops/v3/stores/yaml",
+    importpath = "go.mozilla.org/sops/v3/stores/yaml",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//vendor/go.mozilla.org/sops/v3:sops",
+        "//vendor/go.mozilla.org/sops/v3/stores",
+        "//vendor/gopkg.in/yaml.v3:yaml_v3",
+    ],
+)

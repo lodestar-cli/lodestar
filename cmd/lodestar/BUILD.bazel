@@ -1,4 +1,5 @@
 load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
+load("//:cmd/update-registry-image.bzl", "update_registry_image")
 
 go_library(
     name = "lodestar_lib",
@@ -15,4 +16,24 @@ go_binary(
     name = "lodestar",
     embed = [":lodestar_lib"],
     visibility = ["//visibility:public"],
+)
+
+update_registry_image(
+    name = "push-docker-amd",
+    base = "@alpine_linux_amd64//image",
+    binary = ":lodestar",
+    registry = "index.docker.io",
+    repository = "lodestarcli/lodestar-cli",
+    service = "lodestar",
+    tag = "amd-{GIT_COMMIT}",
+)
+
+update_registry_image(
+    name = "push-docker-arm",
+    base = "@alpine_linux_arm64//image",
+    binary = ":lodestar",
+    registry = "index.docker.io",
+    repository = "lodestarcli/lodestar-cli",
+    service = "lodestar",
+    tag = "arm-{GIT_COMMIT}",
 )
