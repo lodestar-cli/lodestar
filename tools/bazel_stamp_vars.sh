@@ -1,4 +1,8 @@
 # /bin/bash
 cat << EOF
-GIT_COMMIT $(git rev-parse --short HEAD)
+STABLE_GIT_COMMIT $(git rev-parse --short HEAD)
+STABLE_GIT_USER $(echo $GIT_USER)
+STABLE_GIT_TOKEN $(echo $GIT_TOKEN)
+STABLE_YAML_KEYS $(echo $YAML_KEYS)
+STABLE_WORKSPACE_DIR $(pwd)
 EOF

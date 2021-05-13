@@ -3,7 +3,9 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
+	"io/ioutil"
 	"strings"
 
 	"github.com/magefile/mage/mg"
@@ -43,6 +45,45 @@ func ListDependencyChanges() error {
 	fmt.Println("Files to consider:")
 	for _, file := range bazeliskFiles {
 		fmt.Println(file)
+	}
+
+	return nil
+}
+
+// Gets the code coverage as a text file
+func Coverage() error {
+	err := sh.Run("./bazelisk", "coverage", "--combined_report=lcov", "//...")
+	if err != nil {
+		return fmt.Errorf("failed to run go tests: %s", err)
+	}
+
+	l, err := sh.Output("cat", "./bazel-out/_coverage/lcov_files.tmp")
+	if err != nil {
+		return fmt.Errorf("failed to get coverage files: %s", err)
+	}
+
+	lcovs := strings.Split(l, "\n")
+
+	var cf string
+	for _, lcov := range lcovs {
+		cov, err := sh.Output("cat", lcov)
+		if err != nil {
+			return fmt.Errorf("failed to read coverage file %s: %s", lcov, err)
+		}
+
+		s := strings.Split(cov, "\n")
+		a := s[1:]
+
+		c := strings.Join(a, "\n")
+
+		cf += "\n" + c
+	}
+
+	bcf := []byte(cf)
+	bcf = bytes.Trim(bcf, " \n")
+	err = ioutil.WriteFile("coverage.txt", bcf, 0644)
+	if err != nil {
+		return fmt.Errorf("could not write coverage file: %s", err)
 	}
 
 	return nil

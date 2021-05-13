@@ -1,8 +1,10 @@
 load(":app.bzl", "app_push")
 
 app_push(
-    name = "push_example",
+    name = "push",
     app_config = "lodestar-folder-app-example.yaml",
     environment = "dev",
-    yaml_keys = "$(yaml-keys)",
+    token = "{STABLE_GIT_TOKEN}",
+    username = "{STABLE_GIT_USER}",
+    yaml_keys = "{STABLE_YAML_KEYS}",
 )
