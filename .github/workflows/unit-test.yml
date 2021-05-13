@@ -11,8 +11,14 @@ jobs:
     name: Run unit tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
-      - name: run internal package unit tests
-        run: ./bazelisk test //internal/...
-#      - name: run main file unit tests
-#        run: ./bazelisk test //cmd/...
+      - name: Checkout Code
+        uses: actions/checkout@v1
+      - name: Run Code Coverage
+        uses: magefile/mage-action@v1
+        with:
+          version: latest
+          args: coverage
+      - name: Push Code Coverage
+        uses: codecov/codecov-action@v1
+        with:
+          files: coverage.txt

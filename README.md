@@ -3,6 +3,7 @@
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/lodestar-cli/lodestar)](https://goreportcard.com/report/github.com/lodestar-cli/lodestar)
 ![Build](https://github.com/lodestar-cli/lodestar/actions/workflows/main.yml/badge.svg)
+[![codecov](https://codecov.io/gh/lodestar-cli/lodestar/branch/main/graph/badge.svg?token=P56RUR7LQO)](https://codecov.io/gh/lodestar-cli/lodestar)
 ## Overview
 
 GitOps has allowed for development teams to control their DevOps pipelines through the tool they use alsot every day, Git.  By declaring what their code, tests, and deployments will look like through code, developers can work quickly while being reassured what reaches their end users will be in a good state.  Although this sounds nice, code doesn't just magically show up in production.  This is what lead to applications like Kubernetes, CI Tools, and GitOps Controllers (ArgoCD, Flux, etc.) being created.  By using the proper tooling, developers have been able to automate their tests and deployments through different phases (environments) before deploying into production.  A common GitOps pipeline often looks like this:
