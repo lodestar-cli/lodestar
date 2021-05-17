@@ -1,0 +1,21 @@
+load("@lodestar//docker:update-registry-image.bzl", "update_registry_image")
+
+update_registry_image(
+    name = "push-docker-amd",
+    base = "@alpine_linux_amd64//image",
+    binary = "@lodestar//cmd/lodestar:lodestar",
+    registry = "index.docker.io",
+    repository = "lodestarcli/lodestar-cli",
+    service = "lodestar",
+    tag = "amd-{GIT_COMMIT}",
+)
+
+update_registry_image(
+    name = "push-docker-arm",
+    base = "@alpine_linux_arm64//image",
+    binary = "@lodestar//cmd/lodestar:lodestar",
+    registry = "index.docker.io",
+    repository = "lodestarcli/lodestar-cli",
+    service = "lodestar",
+    tag = "arm-{GIT_COMMIT}",
+)

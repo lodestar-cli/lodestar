@@ -22,6 +22,10 @@ http_archive(
 
 load("@io_bazel_rules_go//go:deps.bzl", "go_register_toolchains", "go_rules_dependencies")
 load("@bazel_gazelle//:deps.bzl", "gazelle_dependencies")
+load("//:deps.bzl", "go_dependencies")
+
+# gazelle:repository_macro deps.bzl%go_dependencies
+go_dependencies()
 
 go_rules_dependencies()
 
@@ -57,39 +61,39 @@ load("@io_bazel_rules_docker//repositories:deps.bzl", container_deps = "deps")
 container_deps()
 
 load(
-    "@io_bazel_rules_docker//container:container.bzl", 
-    "container_pull"
+    "@io_bazel_rules_docker//container:container.bzl",
+    "container_pull",
 )
 
 # Load the macro that allows you to customize the docker toolchain configuration.
-load("@io_bazel_rules_docker//toolchains/docker:toolchain.bzl",
-    docker_toolchain_configure="toolchain_configure"
+load(
+    "@io_bazel_rules_docker//toolchains/docker:toolchain.bzl",
+    docker_toolchain_configure = "toolchain_configure",
 )
 
 docker_toolchain_configure(
-  name = "docker_config",
-  # Replace this with an absolute path to a directory which has a custom docker
-  # client config.json. Note relative paths are not supported.
-  # Docker allows you to specify custom authentication credentials
-  # in the client configuration JSON file.
-  # See https://docs.docker.com/engine/reference/commandline/cli/#configuration-files
-  # for more details.
-  client_config="~/.docker"
+    name = "docker_config",
+    # Replace this with an absolute path to a directory which has a custom docker
+    # client config.json. Note relative paths are not supported.
+    # Docker allows you to specify custom authentication credentials
+    # in the client configuration JSON file.
+    # See https://docs.docker.com/engine/reference/commandline/cli/#configuration-files
+    # for more details.
+    client_config = "~/.docker",
 )
-
 
 container_pull(
     name = "alpine_linux_amd64",
+    digest = "sha256:a9c28c813336ece5bb98b36af5b66209ed777a394f4f856c6e62267790883820",
     registry = "index.docker.io",
     repository = "library/alpine",
-    digest = "sha256:a9c28c813336ece5bb98b36af5b66209ed777a394f4f856c6e62267790883820",
     tag = "3.12",
 )
 
 container_pull(
     name = "alpine_linux_arm64",
+    digest = "sha256:aafe499f7db366a66c8abcd7c9cf89bb2fa5336a2d19a63e9272029119b59c73",
     registry = "index.docker.io",
     repository = "arm64v8/alpine",
-    digest = "sha256:aafe499f7db366a66c8abcd7c9cf89bb2fa5336a2d19a63e9272029119b59c73",
     tag = "3.12",
 )

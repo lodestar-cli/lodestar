@@ -1,4 +1,6 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
 load(":app.bzl", "app_push")
+exports_files(["push.go"])
 
 app_push(
     name = "push",
@@ -7,4 +9,17 @@ app_push(
     token = "{STABLE_GIT_TOKEN}",
     username = "{STABLE_GIT_USER}",
     yaml_keys = "{STABLE_YAML_KEYS}",
+)
+
+go_library(
+    name = "app_lib",
+    srcs = ["push.go"],
+    importpath = "github.com/lodestar-cli/lodestar/rules_lodestar/app",
+    visibility = ["//visibility:private"],
+)
+
+go_binary(
+    name = "app",
+    embed = [":app_lib"],
+    visibility = ["//visibility:public"],
 )

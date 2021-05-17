@@ -67,7 +67,8 @@ done
     go_binary(
         name = name,
         srcs = ["@lodestar//rules_lodestar/app:push.go"],
-        data = ["stamps.txt", "lodestar.txt"]
+        data = ["stamps.txt", "lodestar.txt"],
+        visibility = ["//visibility:public"],
     )
 
 

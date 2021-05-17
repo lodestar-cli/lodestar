@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"runtime"
 	"strings"
 
@@ -123,16 +124,22 @@ func getDependencyChanges() ([]string, error) {
 
 // runs bazel rules made for lodestar
 func RunRules() error {
-	os := runtime.GOOS
+	o := runtime.GOOS
+	commit := gitCommit()
+	commit = commit[0:7]
+	yk := "\"tag=" + commit + "\""
+	env["GIT_USER"] = os.Getenv("GIT_USER")
+	env["GIT_TOKEN"] = os.Getenv("GIT_TOKEN")
+	env["YAML_KEYS"] = yk
 
-	switch os {
+	switch o {
 	case "windows":
 		err := sh.Run("bazelisk", "build", "//rules_lodestar/app:push")
 		if err != nil {
 			return fmt.Errorf("failed to run go tests: %s", err)
 		}
 	default:
-		err := sh.Run("bazelisk", "run", "//rules_lodestar/app:push")
+		err := sh.RunWith(env, "bazelisk", "run", "//rules_lodestar/app:push")
 		if err != nil {
 			return fmt.Errorf("failed to run go tests: %s", err)
 		}
@@ -156,11 +163,6 @@ func (CI) Build() error {
 	}
 
 	fileSplat := strings.Join(bazeliskFiles, " ")
-	tests, e := sh.Output("bazelisk", "query", "--keep_going", "--noshow_progress",
-		fmt.Sprintf("kind(test, rdeps(//..., set(%s))) except attr('tags', 'manual', //...)", fileSplat))
-	if e != nil {
-		return fmt.Errorf("Failed to get list of changed tests: %w", e)
-	}
 
 	binaries, e := sh.Output("bazelisk", "query", "--keep_going", "--noshow_progress",
 		fmt.Sprintf("kind(.*_binary, rdeps(//..., set(%s)))", fileSplat))
@@ -186,12 +188,7 @@ func (CI) Build() error {
 		return fmt.Errorf("Failed to list of containers that need to be pushed: %w", e)
 	}
 
-	fmt.Printf("Files to consider: \nBinaries: %s\nTests: %s\nImages: %s\n, Docker: %s\n", binaries, tests, images, dockerPushAmd)
-
-	err = bazeliskRun("test", "test", tests)
-	if err != nil {
-		return err
-	}
+	fmt.Printf("Files to consider: \nBinaries: %s\nImages: %s\n, Docker: %s\n", binaries, images, dockerPushAmd)
 
 	args := []string{}
 

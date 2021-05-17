@@ -19,7 +19,7 @@ var (
 
 func main() {
 
-	filepath.WalkDir(".", getKeyValues)
+	filepath.WalkDir("..", getKeyValues)
 
 	if len(paths) == 0 {
 		log.Fatalf("could not get paths")
