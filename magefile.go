@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
+	"runtime"
 	"strings"
 
 	"github.com/magefile/mage/mg"
@@ -36,6 +37,7 @@ func previousMerge() string {
 	return p
 }
 
+// returns a list of files that changed between merges
 func ListDependencyChanges() error {
 	bazeliskFiles, err := getDependencyChanges()
 	if err != nil {
@@ -52,12 +54,12 @@ func ListDependencyChanges() error {
 
 // Gets the code coverage as a text file
 func Coverage() error {
-	err := sh.Run("./bazelisk", "coverage", "--combined_report=lcov", "//...")
+	err := sh.Run("bazelisk", "coverage", "--combined_report=lcov", "//...")
 	if err != nil {
 		return fmt.Errorf("failed to run go tests: %s", err)
 	}
 
-	l, err := sh.Output("cat", "./bazel-out/_coverage/lcov_files.tmp")
+	l, err := sh.Output("cat", "bazel-out/_coverage/lcov_files.tmp")
 	if err != nil {
 		return fmt.Errorf("failed to get coverage files: %s", err)
 	}
@@ -108,9 +110,9 @@ func getDependencyChanges() ([]string, error) {
 			continue
 		}
 
-		files, e := sh.Output("./bazelisk", "query", file)
+		files, e := sh.Output("bazelisk", "query", file)
 		if e != nil {
-			fmt.Printf("Unable to query ./bazelisk with file: %q, %v", file, e)
+			fmt.Printf("Unable to query bazelisk with file: %q, %v", file, e)
 		} else {
 			bazeliskFiles = append(bazeliskFiles, strings.Split(files, "\n")...)
 		}
@@ -119,8 +121,29 @@ func getDependencyChanges() ([]string, error) {
 	return bazeliskFiles, nil
 }
 
+// runs bazel rules made for lodestar
+func RunRules() error {
+	os := runtime.GOOS
+
+	switch os {
+	case "windows":
+		err := sh.Run("bazelisk", "build", "//rules_lodestar/app:push")
+		if err != nil {
+			return fmt.Errorf("failed to run go tests: %s", err)
+		}
+	default:
+		err := sh.Run("bazelisk", "run", "//rules_lodestar/app:push")
+		if err != nil {
+			return fmt.Errorf("failed to run go tests: %s", err)
+		}
+	}
+
+	return nil
+}
+
 type CI mg.Namespace
 
+// updates Docker images based upon the changes to the code base
 func (CI) Build() error {
 	bazeliskFiles, err := getDependencyChanges()
 	if err != nil {
@@ -133,31 +156,31 @@ func (CI) Build() error {
 	}
 
 	fileSplat := strings.Join(bazeliskFiles, " ")
-	tests, e := sh.Output("./bazelisk", "query", "--keep_going", "--noshow_progress",
+	tests, e := sh.Output("bazelisk", "query", "--keep_going", "--noshow_progress",
 		fmt.Sprintf("kind(test, rdeps(//..., set(%s))) except attr('tags', 'manual', //...)", fileSplat))
 	if e != nil {
 		return fmt.Errorf("Failed to get list of changed tests: %w", e)
 	}
 
-	binaries, e := sh.Output("./bazelisk", "query", "--keep_going", "--noshow_progress",
+	binaries, e := sh.Output("bazelisk", "query", "--keep_going", "--noshow_progress",
 		fmt.Sprintf("kind(.*_binary, rdeps(//..., set(%s)))", fileSplat))
 	if e != nil {
 		return fmt.Errorf("Failed to get list of changed binaries: %w", e)
 	}
 
-	images, e := sh.Output("./bazelisk", "query", "--keep_going", "--noshow_progress",
+	images, e := sh.Output("bazelisk", "query", "--keep_going", "--noshow_progress",
 		fmt.Sprintf("kind(container_image, rdeps(//..., set(%s)))", fileSplat))
 	if e != nil {
 		return fmt.Errorf("Failed to get list of changed images: %w", e)
 	}
 
-	dockerPushAmd, e := sh.Output("./bazelisk", "query", "--keep_going", "--noshow_progress",
+	dockerPushAmd, e := sh.Output("bazelisk", "query", "--keep_going", "--noshow_progress",
 		fmt.Sprintf("filter(amd, kind(container_push, rdeps(//..., set(%s))))", fileSplat))
 	if e != nil {
 		return fmt.Errorf("Failed to list of containers that need to be pushed: %w", e)
 	}
 
-	dockerPushArm, e := sh.Output("./bazelisk", "query", "--keep_going", "--noshow_progress",
+	dockerPushArm, e := sh.Output("bazelisk", "query", "--keep_going", "--noshow_progress",
 		fmt.Sprintf("filter(arm, kind(container_push, rdeps(//..., set(%s))))", fileSplat))
 	if e != nil {
 		return fmt.Errorf("Failed to list of containers that need to be pushed: %w", e)
@@ -215,9 +238,9 @@ func bazeliskRun(name string, cmd string, files string, args ...string) error {
 				a = append(a, arg)
 			}
 			a = append(a, v)
-			err := sh.Run("./bazelisk", a...)
+			err := sh.Run("bazelisk", a...)
 			if err != nil {
-				return fmt.Errorf("Failed to run ./bazelisk cmd: %s on target: %s -%w", cmd, v, err)
+				return fmt.Errorf("Failed to run bazelisk cmd: %s on target: %s -%w", cmd, v, err)
 			}
 		}
 	}
