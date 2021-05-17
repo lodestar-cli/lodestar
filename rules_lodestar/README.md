@@ -2,7 +2,7 @@
 
 This folder provides some Bazel genrules wrapped in macros to run in your bazel builds.  Bazel is often used to a,build, and deploy a binary, and these can be added to the end of that flow to keep everything ran with a single tool.  This also allows for Lodestar to be ran without having it installed on a local machine.  As long as Bazel is installed and Lodestar is declared in the WORKSPACE, then it should be able to run the same as if it were called from the commandline.
 
-**NOTE: In order to run these rules on Windows, you must have bash installed**
+**NOTE: Do not run these rules on Windows. They will build appropriately, however, they will throw errors if attempting to bazel run them.  Please use either Linux or MacOS to run these rules.**
 
 ## WORKSPACE
 
