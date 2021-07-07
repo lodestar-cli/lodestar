@@ -127,7 +127,7 @@ func RunRules() error {
 	o := runtime.GOOS
 	commit := gitCommit()
 	commit = commit[0:7]
-	yk := "\"tag=" + commit + "\""
+	yk := "tag=" + commit
 	env["GIT_USER"] = os.Getenv("GIT_USER")
 	env["GIT_TOKEN"] = os.Getenv("GIT_TOKEN")
 	env["YAML_KEYS"] = yk

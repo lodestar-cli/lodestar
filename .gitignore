@@ -5,3 +5,4 @@ bazel-*/*
 /output/
 # Ignore goland files
 .idea/*
+dist/
