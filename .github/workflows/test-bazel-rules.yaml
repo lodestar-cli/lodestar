@@ -1,12 +1,15 @@
-name: Windows - A workflow for testing lodestar bazel rules
+name: Test Bazel Rules
 on:
   pull_request:
     branches:
       - main
 jobs:
   test:
-    name: Run Bazel rules
-    runs-on: windows-latest
+    name: Test Bazel rules
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v1
@@ -18,4 +21,3 @@ jobs:
         env:
           GIT_USER: ${{ secrets.GIT_USER }}
           GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
-          YAML_KEYS: "tag=1234567"
