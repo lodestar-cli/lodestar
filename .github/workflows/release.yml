@@ -22,3 +22,5 @@ jobs:
           version: latest
           workdir: cmd/lodestar
           args: release --rm-dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
