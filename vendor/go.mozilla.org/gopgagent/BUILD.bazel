@@ -1,9 +1,0 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library")
-
-go_library(
-    name = "gopgagent",
-    srcs = ["gpgagent.go"],
-    importmap = "github.com/lodestar-cli/lodestar/vendor/go.mozilla.org/gopgagent",
-    importpath = "go.mozilla.org/gopgagent",
-    visibility = ["//visibility:public"],
-)

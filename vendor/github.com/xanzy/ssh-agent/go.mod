@@ -1,6 +1,9 @@
 module github.com/xanzy/ssh-agent
 
+go 1.16
+
 require (
-	golang.org/x/crypto v0.0.0-20190219172222-a4c6cb3142f2
-	golang.org/x/sys v0.0.0-20190221075227-b4e8571b14e0 // indirect
+	github.com/Microsoft/go-winio v0.5.2
+	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d
+	golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8
 )
